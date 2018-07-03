@@ -4,44 +4,44 @@ library BazaarLib {
     struct Item {
         bytes32 id;
         bytes32 name;
-        bytes32 description;
         uint256 price;
         uint256 quantity;
+        address seller;
     }
 
-    event ItemAdded(
+    event NewItem(
         bytes32 name,
         uint256 price,
         uint256 quantity,
         address seller
     );
 
-    event ItemSold(
+    event Purchase(
         bytes32 name,
         uint256 quantity,
         uint256 total,
-        address buyer,
+        address customer,
         address seller
     );
 
-    function emitItemAdded(
+    function emitNewItem(
         bytes32 _name,
         uint256 _price,
         uint256 _quantity,
         address _seller
     ) public
     {
-        emit ItemAdded(_name, _price, _quantity, _seller);
+        emit NewItem(_name, _price, _quantity, _seller);
     }
 
-    function emitItemSold(
+    function emitPurchase(
         bytes32 _name,
         uint256 _quantity,
         uint256 _total,
-        address _buyer,
+        address _customer,
         address _seller
     ) public
     {
-        emit ItemSold(_name, _quantity, _total, _buyer, _seller);
+        emit Purchase(_name, _quantity, _total, _customer, _seller);
     }
 }

@@ -9,8 +9,9 @@ contract Bazaar is Ownable {
     using SafeMath for uint256;
     using BazaarLib for BazaarLib.Item;
 
+    bytes32[] private itemIds;
     mapping(bytes32 => uint256) private availability;
-    mapping(bytes32 => address) private sellerOf;
+    mapping(bytes32 => BazaarLib.Item) private detailsOf;
     mapping(address => BazaarLib.Item[]) private itemsOf;
 
     /**
@@ -61,11 +62,11 @@ contract Bazaar is Ownable {
     }
 
     /**
-     * @dev Adds an item to seller's items.
+     * @dev Adds an item for sale. If item already exists, only its quantity is increased.
      * @param _name The item name.
      * @param _description The item description.
-     * @param _price The item price (per piece).
-     * @param _quantity Quantity (pieces).
+     * @param _price The item price.
+     * @param _quantity Quantity available.
      */
     function addItem(
         bytes32 _name,
@@ -81,29 +82,37 @@ contract Bazaar is Ownable {
     {
         bytes32 itemId = keccak256(abi.encodePacked(msg.sender, _name, _description, _price));
         if (availability[itemId] > 0) {
-            uint256 index = getItemIndex(msg.sender, itemId);
-            BazaarLib.Item storage storedItem = itemsOf[msg.sender][index];
-            storedItem.quantity = storedItem.quantity.add(_quantity);
+            availability[itemId] = availability[itemId].add(_quantity);
         } else {
-            BazaarLib.Item memory item = BazaarLib.Item({
-                id: itemId,
-                name: _name,
-                description: _description,
-                price: _price,
-                quantity: _quantity
-            });
-            sellerOf[itemId] = msg.sender;
+            BazaarLib.Item memory item;
+            item.id = itemId;
+            item.name = _name;
+            item.price = _price;
+            item.seller = msg.sender;
+
+            itemIds.push(itemId);
+            detailsOf[itemId] = item;
             itemsOf[msg.sender].push(item);
+            availability[itemId] = _quantity;
+
+            BazaarLib.emitNewItem(_name, _price, _quantity, msg.sender);
         }
-        availability[itemId] = availability[itemId].add(_quantity);
-        BazaarLib.emitItemAdded(_name, _price, _quantity, msg.sender);
+    }
+
+    /**
+     * @dev Returns all items in the bazaar.
+     */
+    function getAllItems() public view
+        returns (bytes32[], bytes32[], uint256[], uint256[])
+    {
+        return toTupleOfArraysAll();
     }
 
     /**
      * @dev Returns all items of the seller. Intended to be invoked by the seller.
      */
     function getItems() public view
-        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+        returns (bytes32[], bytes32[], uint256[], uint256[])
     {
         return toTupleOfArrays(msg.sender);
     }
@@ -113,57 +122,43 @@ contract Bazaar is Ownable {
      * @param _seller The seller address.
      */
     function getItems(address _seller) public view
-        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+        returns (bytes32[], bytes32[], uint256[], uint256[])
     {
         return toTupleOfArrays(_seller);
     }
 
     /**
-     * @dev Buys \p _quantity pieces of the item.
+     * @dev Used by customers to purchase certain \p _quantity of the item.
      * @param _itemId The item id (hash).
-     * @param _quantity Pieces to buy.
+     * @param _quantity Purchased quantity.
      */
-    function buyItem(bytes32 _itemId, uint256 _quantity)
+    function purchase(bytes32 _itemId, uint256 _quantity)
         public
         ownerNotAllowed
         available(_itemId)
         inStock(_itemId, _quantity)
         payable
     {
-        address seller = sellerOf[_itemId];
-        if (seller == msg.sender) {
-            revert("Sellers are not allowed to buy their own items.");
+        BazaarLib.Item storage item = detailsOf[_itemId];
+        if (item.seller == msg.sender) {
+            revert("Sellers are not allowed to purchase their own items.");
         }
-
-        uint256 index = getItemIndex(seller, _itemId);
-        BazaarLib.Item storage item = itemsOf[seller][index];
 
         if (msg.value != item.price * _quantity) {
             revert("Amount provided does not match the total cost.");
         }
 
         availability[_itemId] = availability[_itemId].sub(_quantity);
-        item.quantity = item.quantity.sub(_quantity);
-
-        seller.transfer(msg.value);
-        BazaarLib.emitItemSold(item.name, _quantity, msg.value, msg.sender, seller);
-    }
-
-    function getItemIndex(address _addr, bytes32 _itemId) private view returns(uint256) {
-        uint256 i = 0;
-        while (itemsOf[_addr][i].id != _itemId) {
-            i++;
-        }
-        return i;
+        item.seller.transfer(msg.value);
+        BazaarLib.emitPurchase(item.name, _quantity, msg.value, msg.sender, item.seller);
     }
 
     function toTupleOfArrays(address _addr) private view
-        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+        returns (bytes32[], bytes32[], uint256[], uint256[])
     {
         uint256 itemsCount = itemsOf[_addr].length;
         bytes32[] memory ids = new bytes32[](itemsCount);
         bytes32[] memory names = new bytes32[](itemsCount);
-        bytes32[] memory descriptions = new bytes32[](itemsCount);
         uint256[] memory prices = new uint256[](itemsCount);
         uint256[] memory quantities = new uint256[](itemsCount);
 
@@ -171,10 +166,30 @@ contract Bazaar is Ownable {
             BazaarLib.Item storage item = itemsOf[_addr][i];
             ids[i] = item.id;
             names[i] = item.name;
-            descriptions[i] = item.description;
             prices[i] = item.price;
-            quantities[i] = item.quantity;
+            quantities[i] = availability[item.id];
         }
-        return (ids, names, descriptions, prices, quantities);
+
+        return (ids, names, prices, quantities);
+    }
+
+    function toTupleOfArraysAll() private view
+        returns (bytes32[], bytes32[], uint256[], uint256[])
+    {
+        uint256 itemsCount = itemIds.length;
+        bytes32[] memory ids = new bytes32[](itemsCount);
+        bytes32[] memory names = new bytes32[](itemsCount);
+        uint256[] memory prices = new uint256[](itemsCount);
+        uint256[] memory quantities = new uint256[](itemsCount);
+
+        for (uint256 i = 0; i < itemsCount; i++) {
+            BazaarLib.Item storage item = detailsOf[itemIds[i]];
+            ids[i] = item.id;
+            names[i] = item.name;
+            prices[i] = item.price;
+            quantities[i] = availability[item.id];
+        }
+
+        return (ids, names, prices, quantities);
     }
 }
