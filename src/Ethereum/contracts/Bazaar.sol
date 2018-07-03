@@ -11,7 +11,7 @@ contract Bazaar is Ownable {
 
     mapping(bytes32 => uint256) private availability;
     mapping(bytes32 => address) private sellerOf;
-    mapping(address => Item[]) private itemsOf;
+    mapping(address => BazaarLib.Item[]) private itemsOf;
 
     /**
      * @dev Throws if called by the contract owner account.
@@ -45,8 +45,8 @@ contract Bazaar is Ownable {
      * @param _value The value to check.
      * @param _name Parameter name (used in the error message).
      */
-    modifier notEmpty(string _value, string _name) {
-        require(!isEmpty(_value), string(abi.encodePacked(_name, " cannot be empty.")));
+    modifier notEmpty(bytes32 _value, string _name) {
+        require(_value.length > 0, string(abi.encodePacked(_name, " cannot be empty.")));
         _;
     }
 
@@ -68,8 +68,8 @@ contract Bazaar is Ownable {
      * @param _quantity Quantity (pieces).
      */
     function addItem(
-        string _name,
-        string _description,
+        bytes32 _name,
+        bytes32 _description,
         uint256 _price,
         uint256 _quantity
     )
@@ -79,12 +79,13 @@ contract Bazaar is Ownable {
         positive(_price, "Price")
         positive(_quantity, "Quantity")
     {
-        bytes32 itemId = keccak256(msg.sender, _name, _description, _price);
+        bytes32 itemId = keccak256(abi.encodePacked(msg.sender, _name, _description, _price));
         if (availability[itemId] > 0) {
             uint256 index = getItemIndex(msg.sender, itemId);
-            itemsOf[msg.sender][index].quantity = itemsOf[msg.sender][index].quantity.add(_quantity);
+            BazaarLib.Item storage storedItem = itemsOf[msg.sender][index];
+            storedItem.quantity = storedItem.quantity.add(_quantity);
         } else {
-            Item memory item = Item({
+            BazaarLib.Item memory item = BazaarLib.Item({
                 id: itemId,
                 name: _name,
                 description: _description,
@@ -95,22 +96,26 @@ contract Bazaar is Ownable {
             itemsOf[msg.sender].push(item);
         }
         availability[itemId] = availability[itemId].add(_quantity);
-        emit ItemAdd(_name, _price, _quantity, msg.sender);
+        BazaarLib.emitItemAdded(_name, _price, _quantity, msg.sender);
     }
 
     /**
      * @dev Returns all items of the seller. Intended to be invoked by the seller.
      */
-    function getItems() public view returns(Item[] items){
-        return itemsOf[msg.sender];
+    function getItems() public view
+        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+    {
+        return toTupleOfArrays(msg.sender);
     }
 
     /**
      * @dev Returns all items of the seller specified by \p _seller.
      * @param _seller The seller address.
      */
-    function getItems(address _seller) public view returns(Item[] items){
-        return itemsOf[_seller];
+    function getItems(address _seller) public view
+        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+    {
+        return toTupleOfArrays(_seller);
     }
 
     /**
@@ -125,33 +130,51 @@ contract Bazaar is Ownable {
         inStock(_itemId, _quantity)
         payable
     {
-        address memory seller = sellerOf[_itemId];
+        address seller = sellerOf[_itemId];
         if (seller == msg.sender) {
             revert("Sellers are not allowed to buy their own items.");
         }
 
-        uint256 memory index = getItemIndex(seller, _itemId);
-        if (msg.value != itemsOf[seller][index].price * _quantity) {
+        uint256 index = getItemIndex(seller, _itemId);
+        BazaarLib.Item storage item = itemsOf[seller][index];
+
+        if (msg.value != item.price * _quantity) {
             revert("Amount provided does not match the total cost.");
         }
 
-        availability[_itemId] = availability[_itemId].subtract(_quantity);
-        itemsOf[seller][index].quantity = itemsOf[seller][index].quantity.subtract(_quantity);
+        availability[_itemId] = availability[_itemId].sub(_quantity);
+        item.quantity = item.quantity.sub(_quantity);
 
         seller.transfer(msg.value);
-        emit ItemBuy(itemsOf[seller][index].name, _quantity, msg.value, msg.sender, seller);
+        BazaarLib.emitItemSold(item.name, _quantity, msg.value, msg.sender, seller);
     }
 
     function getItemIndex(address _addr, bytes32 _itemId) private view returns(uint256) {
         uint256 i = 0;
-        while (itemsOf[_addr][i].Id != _itemId) {
+        while (itemsOf[_addr][i].id != _itemId) {
             i++;
         }
         return i;
     }
 
-    function isEmpty(string _value) private pure returns (bool) {
-        bytes memory asByteArray = bytes(_value);
-        return asByteArray.length == 0;
+    function toTupleOfArrays(address _addr) private view
+        returns (bytes32[], bytes32[], bytes32[], uint256[], uint256[])
+    {
+        uint256 itemsCount = itemsOf[_addr].length;
+        bytes32[] memory ids = new bytes32[](itemsCount);
+        bytes32[] memory names = new bytes32[](itemsCount);
+        bytes32[] memory descriptions = new bytes32[](itemsCount);
+        uint256[] memory prices = new uint256[](itemsCount);
+        uint256[] memory quantities = new uint256[](itemsCount);
+
+        for (uint256 i = 0; i < itemsCount; i++) {
+            BazaarLib.Item storage item = itemsOf[_addr][i];
+            ids[i] = item.id;
+            names[i] = item.name;
+            descriptions[i] = item.description;
+            prices[i] = item.price;
+            quantities[i] = item.quantity;
+        }
+        return (ids, names, descriptions, prices, quantities);
     }
 }
