@@ -6,7 +6,6 @@ import "../contracts/BazaarLib.sol";
 import "../contracts/Bazaar.sol";
 
 contract BazaarTest{
-/*
     Bazaar bazaar;
     bytes32 itemId = keccak256(abi.encodePacked(block.number));
 
@@ -68,5 +67,4 @@ contract BazaarTest{
             _quantity
         );
     }
-*/
 }

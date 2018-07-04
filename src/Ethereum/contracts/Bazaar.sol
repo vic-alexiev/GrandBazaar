@@ -16,7 +16,7 @@ contract Bazaar is Ownable {
     mapping(bytes32 => uint256) public availability;
     mapping(bytes32 => BazaarLib.Item) public detailsOf;
     mapping(address => bytes32[]) private itemsOf;
-    bytes32[] private items;
+    bytes32[] public items;
 
     constructor(uint256 _commission) public {
         commission = _commission;
@@ -84,27 +84,22 @@ contract Bazaar is Ownable {
         positive(_price)
         positive(_quantity)
     {
-        if (availability[_itemId] > 0) {
-            availability[_itemId] = availability[_itemId].add(_quantity);
-        } else {
-            BazaarLib.Item memory item;
-            item.price = _price;
-            item.seller = msg.sender;
+        BazaarLib.Item memory item;
+        item.price = _price;
+        item.seller = msg.sender;
 
-            items.push(_itemId);
-            detailsOf[_itemId] = item;
-            itemsOf[msg.sender].push(_itemId);
-            availability[_itemId] = _quantity;
+        items.push(_itemId);
+        detailsOf[_itemId] = item;
+        itemsOf[msg.sender].push(_itemId);
+        availability[_itemId] = _quantity;
 
-            BazaarLib.emitNewItem(_itemId, _price, _quantity, msg.sender);
-        }
+        BazaarLib.emitNewItem(_itemId, _price, _quantity, msg.sender);
     }
 
     /**
      * @dev Returns all items in the bazaar.
      */
-    function getAllItems() public view
-        returns (bytes32[])
+    function getAllItems() public view returns (bytes32[])
     {
         return items;
     }
@@ -112,8 +107,7 @@ contract Bazaar is Ownable {
     /**
      * @dev Returns all items of the seller. Intended to be invoked by the seller.
      */
-    function getItems() public view ownerNotAllowed
-        returns (bytes32[])
+    function getItems() public view ownerNotAllowed returns (bytes32[])
     {
         return itemsOf[msg.sender];
     }

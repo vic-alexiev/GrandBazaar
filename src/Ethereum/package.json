@@ -2,7 +2,7 @@
   "name": "grand-bazaar-ethereum",
   "version": "1.0.0",
   "devDependencies": {
-    "solidity-coverage": "^0.5.4"
+    "solidity-coverage": "^0.5.5"
   },
   "scripts": {
     "test": "truffle test",
