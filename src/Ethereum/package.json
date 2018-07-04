@@ -10,6 +10,7 @@
     "test:coverage": "solidity-coverage"
   },
   "dependencies": {
+    "web3": "^1.0.0-beta.34",
     "zeppelin-solidity": "^1.10.0"
   }
 }

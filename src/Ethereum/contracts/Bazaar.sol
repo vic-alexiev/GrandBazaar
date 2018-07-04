@@ -1,5 +1,8 @@
 pragma solidity ^0.4.23;
 
+//import "github.com/OpenZeppelin/zeppelin-solidity/contracts/ownership/Ownable.sol";
+//import "github.com/OpenZeppelin/zeppelin-solidity/contracts/math/SafeMath.sol";
+
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -9,16 +12,30 @@ contract Bazaar is Ownable {
     using SafeMath for uint256;
     using BazaarLib for BazaarLib.Item;
 
-    bytes32[] private itemIds;
-    mapping(bytes32 => uint256) private availability;
-    mapping(bytes32 => BazaarLib.Item) private detailsOf;
-    mapping(address => BazaarLib.Item[]) private itemsOf;
+    uint256 public commission;
+    mapping(bytes32 => uint256) public availability;
+    mapping(bytes32 => BazaarLib.Item) public detailsOf;
+    mapping(address => bytes32[]) private itemsOf;
+    bytes32[] private items;
+
+    constructor(uint256 _commission) public {
+        commission = _commission;
+    }
 
     /**
      * @dev Throws if called by the contract owner account.
      */
     modifier ownerNotAllowed() {
         require(msg.sender != owner, "Owner is not allowed to call this function.");
+        _;
+    }
+
+    /**
+     * @dev Throws if item's availability doesn't equal 0.
+     * @param _itemId The item Id (hash).
+     */
+    modifier isNew(bytes32 _itemId) {
+        require(availability[_itemId] == 0, "Item has already been added.");
         _;
     }
 
@@ -42,60 +59,44 @@ contract Bazaar is Ownable {
     }
 
     /**
-     * @dev Throws if \p _value is empty.
-     * @param _value The value to check.
-     * @param _name Parameter name (used in the error message).
-     */
-    modifier notEmpty(bytes32 _value, string _name) {
-        require(_value.length > 0, string(abi.encodePacked(_name, " cannot be empty.")));
-        _;
-    }
-
-    /**
      * @dev Throws if \p _value is not positive.
      * @param _value The value to check.
-     * @param _name Parameter name (used in the error message).
      */
-    modifier positive(uint256 _value, string _name) {
-        require(_value > 0, string(abi.encodePacked(_name, " must be greater than 0.")));
+    modifier positive(uint256 _value) {
+        require(_value > 0, "Value must be greater than 0.");
         _;
     }
 
     /**
      * @dev Adds an item for sale. If item already exists, only its quantity is increased.
-     * @param _name The item name.
-     * @param _description The item description.
+     * @param _itemId The item Id (hash).
      * @param _price The item price.
      * @param _quantity Quantity available.
      */
     function addItem(
-        bytes32 _name,
-        bytes32 _description,
+        bytes32 _itemId,
         uint256 _price,
         uint256 _quantity
     )
         public
         ownerNotAllowed
-        notEmpty(_name, "Name")
-        positive(_price, "Price")
-        positive(_quantity, "Quantity")
+        isNew(_itemId)
+        positive(_price)
+        positive(_quantity)
     {
-        bytes32 itemId = keccak256(abi.encodePacked(msg.sender, _name, _description, _price));
-        if (availability[itemId] > 0) {
-            availability[itemId] = availability[itemId].add(_quantity);
+        if (availability[_itemId] > 0) {
+            availability[_itemId] = availability[_itemId].add(_quantity);
         } else {
             BazaarLib.Item memory item;
-            item.id = itemId;
-            item.name = _name;
             item.price = _price;
             item.seller = msg.sender;
 
-            itemIds.push(itemId);
-            detailsOf[itemId] = item;
-            itemsOf[msg.sender].push(item);
-            availability[itemId] = _quantity;
+            items.push(_itemId);
+            detailsOf[_itemId] = item;
+            itemsOf[msg.sender].push(_itemId);
+            availability[_itemId] = _quantity;
 
-            BazaarLib.emitNewItem(_name, _price, _quantity, msg.sender);
+            BazaarLib.emitNewItem(_itemId, _price, _quantity, msg.sender);
         }
     }
 
@@ -103,28 +104,18 @@ contract Bazaar is Ownable {
      * @dev Returns all items in the bazaar.
      */
     function getAllItems() public view
-        returns (bytes32[], bytes32[], uint256[], uint256[])
+        returns (bytes32[])
     {
-        return toTupleOfArraysAll();
+        return items;
     }
 
     /**
      * @dev Returns all items of the seller. Intended to be invoked by the seller.
      */
-    function getItems() public view
-        returns (bytes32[], bytes32[], uint256[], uint256[])
+    function getItems() public view ownerNotAllowed
+        returns (bytes32[])
     {
-        return toTupleOfArrays(msg.sender);
-    }
-
-    /**
-     * @dev Returns all items of the seller specified by \p _seller.
-     * @param _seller The seller address.
-     */
-    function getItems(address _seller) public view
-        returns (bytes32[], bytes32[], uint256[], uint256[])
-    {
-        return toTupleOfArrays(_seller);
+        return itemsOf[msg.sender];
     }
 
     /**
@@ -149,47 +140,19 @@ contract Bazaar is Ownable {
         }
 
         availability[_itemId] = availability[_itemId].sub(_quantity);
-        item.seller.transfer(msg.value);
-        BazaarLib.emitPurchase(item.name, _quantity, msg.value, msg.sender, item.seller);
+        uint256 transferAmount = calculateTransferAmount(msg.value, commission);
+        item.seller.transfer(transferAmount);
+        BazaarLib.emitPurchase(_itemId, _quantity, msg.value, msg.sender, item.seller);
     }
 
-    function toTupleOfArrays(address _addr) private view
-        returns (bytes32[], bytes32[], uint256[], uint256[])
+    function calculateTransferAmount(
+        uint256 _purchaseAmount,
+        uint256 _commission
+    )
+        private
+        pure
+        returns (uint256 transferAmount)
     {
-        uint256 itemsCount = itemsOf[_addr].length;
-        bytes32[] memory ids = new bytes32[](itemsCount);
-        bytes32[] memory names = new bytes32[](itemsCount);
-        uint256[] memory prices = new uint256[](itemsCount);
-        uint256[] memory quantities = new uint256[](itemsCount);
-
-        for (uint256 i = 0; i < itemsCount; i++) {
-            BazaarLib.Item storage item = itemsOf[_addr][i];
-            ids[i] = item.id;
-            names[i] = item.name;
-            prices[i] = item.price;
-            quantities[i] = availability[item.id];
-        }
-
-        return (ids, names, prices, quantities);
-    }
-
-    function toTupleOfArraysAll() private view
-        returns (bytes32[], bytes32[], uint256[], uint256[])
-    {
-        uint256 itemsCount = itemIds.length;
-        bytes32[] memory ids = new bytes32[](itemsCount);
-        bytes32[] memory names = new bytes32[](itemsCount);
-        uint256[] memory prices = new uint256[](itemsCount);
-        uint256[] memory quantities = new uint256[](itemsCount);
-
-        for (uint256 i = 0; i < itemsCount; i++) {
-            BazaarLib.Item storage item = detailsOf[itemIds[i]];
-            ids[i] = item.id;
-            names[i] = item.name;
-            prices[i] = item.price;
-            quantities[i] = availability[item.id];
-        }
-
-        return (ids, names, prices, quantities);
+        return (100 - _commission) * _purchaseAmount / 100;
     }
 }

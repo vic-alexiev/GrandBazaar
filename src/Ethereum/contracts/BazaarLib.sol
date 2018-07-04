@@ -2,22 +2,19 @@ pragma solidity ^0.4.23;
 
 library BazaarLib {
     struct Item {
-        bytes32 id;
-        bytes32 name;
         uint256 price;
-        uint256 quantity;
         address seller;
     }
 
     event NewItem(
-        bytes32 name,
+        bytes32 itemId,
         uint256 price,
         uint256 quantity,
         address seller
     );
 
     event Purchase(
-        bytes32 name,
+        bytes32 itemId,
         uint256 quantity,
         uint256 total,
         address customer,
@@ -25,23 +22,23 @@ library BazaarLib {
     );
 
     function emitNewItem(
-        bytes32 _name,
+        bytes32 _itemId,
         uint256 _price,
         uint256 _quantity,
         address _seller
     ) public
     {
-        emit NewItem(_name, _price, _quantity, _seller);
+        emit NewItem(_itemId, _price, _quantity, _seller);
     }
 
     function emitPurchase(
-        bytes32 _name,
+        bytes32 _itemId,
         uint256 _quantity,
         uint256 _total,
         address _customer,
         address _seller
     ) public
     {
-        emit Purchase(_name, _quantity, _total, _customer, _seller);
+        emit Purchase(_itemId, _quantity, _total, _customer, _seller);
     }
 }
