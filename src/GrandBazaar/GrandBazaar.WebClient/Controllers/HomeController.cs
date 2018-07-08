@@ -5,13 +5,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using GrandBazaar.WebClient.Models;
+using GrandBazaar.Domain;
 
 namespace GrandBazaar.WebClient.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        IIpfsService _ipfsService;
+
+        public HomeController(IIpfsService ipfsService)
         {
+            _ipfsService = ipfsService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            string hash = await _ipfsService.AddFileAsync(@"C:\temp\album\butterfly.png").ConfigureAwait(false);
             return View();
         }
 
