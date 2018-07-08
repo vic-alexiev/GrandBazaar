@@ -5,8 +5,8 @@ const FINNEY = 10**15;
 contract("Bazaar", accounts => {
     const [firstAccount, secondAccount, thirdAccount] = accounts;
     let bazaar;
-    let itemId1 = web3.sha3("test1");
-    let itemId2 = web3.sha3("test2");
+    let itemId1 = web3.sha3("itemId1");
+    let itemId2 = web3.sha3("itemId2");
 
     beforeEach(async () => {
         bazaar = await Bazaar.new(5);
@@ -33,7 +33,7 @@ contract("Bazaar", accounts => {
         }
     });
 
-    it.only("allows non-owners to add items: 1 seller adds 1 item", async () => {
+    it("allows non-owners to add items: 1 seller adds 1 item", async () => {
         await bazaar.addItem(
             itemId1,
             15 * FINNEY,
@@ -46,11 +46,11 @@ contract("Bazaar", accounts => {
         assert.equal(itemDetails1[0], 15 * FINNEY);
         assert.equal(itemDetails1[1], secondAccount);
 
-        let sellerItems = await bazaar.getItems({ from: secondAccount });
+        let sellerItems = await bazaar.getItems.call({ from: secondAccount });
         assert.equal(sellerItems.length, 1);
         assert.equal(sellerItems[0], itemId1);
 
-        let allItems = await bazaar.getAllItems();
+        let allItems = await bazaar.getAllItems.call();
         assert.equal(allItems.length, 1);
         assert.equal(allItems[0], itemId1);
     });
@@ -126,12 +126,12 @@ contract("Bazaar", accounts => {
         assert.equal(itemDetails2[0], 30 * FINNEY);
         assert.equal(itemDetails2[1], secondAccount);
 
-        let sellerItems = await bazaar.getItems({ from: secondAccount });
+        let sellerItems = await bazaar.getItems.call({ from: secondAccount });
         assert.equal(sellerItems.length, 2);
         assert.equal(sellerItems[0], itemId1);
         assert.equal(sellerItems[1], itemId2);
 
-        let allItems = await bazaar.getAllItems();
+        let allItems = await bazaar.getAllItems.call();
         assert.equal(allItems.length, 2);
         assert.equal(allItems[0], itemId1);
         assert.equal(allItems[1], itemId2);
@@ -161,15 +161,15 @@ contract("Bazaar", accounts => {
         assert.equal(itemDetails2[0], 30 * FINNEY);
         assert.equal(itemDetails2[1], thirdAccount);
 
-        let sellerItems1 = await bazaar.getItems({ from: secondAccount });
+        let sellerItems1 = await bazaar.getItems.call({ from: secondAccount });
         assert.equal(sellerItems1.length, 1);
         assert.equal(sellerItems1[0], itemId1);
 
-        let sellerItems2 = await bazaar.getItems({ from: thirdAccount });
+        let sellerItems2 = await bazaar.getItems.call({ from: thirdAccount });
         assert.equal(sellerItems2.length, 1);
         assert.equal(sellerItems2[0], itemId2);
 
-        let allItems = await bazaar.getAllItems();
+        let allItems = await bazaar.getAllItems.call();
         assert.equal(allItems.length, 2);
         assert.equal(allItems[0], itemId1);
         assert.equal(allItems[1], itemId2);

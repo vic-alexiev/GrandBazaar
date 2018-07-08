@@ -9,13 +9,14 @@ library BazaarLib {
     event NewItem(
         bytes32 itemId,
         uint256 price,
-        uint256 quantity,
+        uint32 quantity,
         address seller
     );
 
     event Purchase(
         bytes32 itemId,
-        uint256 quantity,
+        uint256 price,
+        uint32 quantity,
         uint256 total,
         address customer,
         address seller
@@ -24,7 +25,7 @@ library BazaarLib {
     function emitNewItem(
         bytes32 _itemId,
         uint256 _price,
-        uint256 _quantity,
+        uint32 _quantity,
         address _seller
     ) public
     {
@@ -33,12 +34,13 @@ library BazaarLib {
 
     function emitPurchase(
         bytes32 _itemId,
-        uint256 _quantity,
+        uint256 _price,
+        uint32 _quantity,
         uint256 _total,
         address _customer,
         address _seller
     ) public
     {
-        emit Purchase(_itemId, _quantity, _total, _customer, _seller);
+        emit Purchase(_itemId, _price, _quantity, _total, _customer, _seller);
     }
 }

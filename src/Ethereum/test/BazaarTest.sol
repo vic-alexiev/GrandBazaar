@@ -55,13 +55,13 @@ contract BazaarTest{
     function callAddItem(
         bytes32 _itemId,
         uint256 _price,
-        uint256 _quantity
+        uint32 _quantity
     )
         private
         returns (bool success)
     {
         return bazaar.call(
-            bytes4(keccak256("addItem(bytes32,uint256,uint256)")),
+            bytes4(keccak256("addItem(bytes32,uint256,uint32)")),
             _itemId,
             _price,
             _quantity

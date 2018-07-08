@@ -1,25 +1,28 @@
 pragma solidity ^0.4.23;
 
-//import "github.com/OpenZeppelin/zeppelin-solidity/contracts/ownership/Ownable.sol";
-//import "github.com/OpenZeppelin/zeppelin-solidity/contracts/math/SafeMath.sol";
-
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
-
 import "./BazaarLib.sol";
 
-contract Bazaar is Ownable {
-    using SafeMath for uint256;
+contract Bazaar {
     using BazaarLib for BazaarLib.Item;
 
-    uint256 public commission;
-    mapping(bytes32 => uint256) public availability;
+    address public owner;
+    uint8 public commission;
+    mapping(bytes32 => uint32) public availability;
     mapping(bytes32 => BazaarLib.Item) public detailsOf;
-    mapping(address => bytes32[]) private itemsOf;
+    mapping(address => bytes32[]) public itemsOf;
     bytes32[] public items;
 
-    constructor(uint256 _commission) public {
+    constructor(uint8 _commission) public {
+        owner = msg.sender;
         commission = _commission;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
     }
 
     /**
@@ -53,7 +56,7 @@ contract Bazaar is Ownable {
      * @param _itemId The item Id (hash).
      * @param _count The quantity to check against.
      */
-    modifier inStock(bytes32 _itemId, uint256 _count) {
+    modifier inStock(bytes32 _itemId, uint32 _count) {
         require(availability[_itemId] >= _count, "Not enough stock.");
         _;
     }
@@ -76,7 +79,7 @@ contract Bazaar is Ownable {
     function addItem(
         bytes32 _itemId,
         uint256 _price,
-        uint256 _quantity
+        uint32 _quantity
     )
         public
         ownerNotAllowed
@@ -117,7 +120,7 @@ contract Bazaar is Ownable {
      * @param _itemId The item id (hash).
      * @param _quantity Purchased quantity.
      */
-    function purchase(bytes32 _itemId, uint256 _quantity)
+    function purchase(bytes32 _itemId, uint32 _quantity)
         public
         ownerNotAllowed
         available(_itemId)
@@ -133,15 +136,15 @@ contract Bazaar is Ownable {
             revert("Amount provided does not match the total cost.");
         }
 
-        availability[_itemId] = availability[_itemId].sub(_quantity);
+        availability[_itemId] -= _quantity;
         uint256 transferAmount = calculateTransferAmount(msg.value, commission);
         item.seller.transfer(transferAmount);
-        BazaarLib.emitPurchase(_itemId, _quantity, msg.value, msg.sender, item.seller);
+        BazaarLib.emitPurchase(_itemId, item.price, _quantity, msg.value, msg.sender, item.seller);
     }
 
     function calculateTransferAmount(
         uint256 _purchaseAmount,
-        uint256 _commission
+        uint8 _commission
     )
         private
         pure
