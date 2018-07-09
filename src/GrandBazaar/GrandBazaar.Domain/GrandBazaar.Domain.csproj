@@ -9,4 +9,8 @@
     <PackageReference Include="Nethereum.Web3" Version="2.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GrandBazaar.Common\GrandBazaar.Common.csproj" />
+  </ItemGroup>
+
 </Project>

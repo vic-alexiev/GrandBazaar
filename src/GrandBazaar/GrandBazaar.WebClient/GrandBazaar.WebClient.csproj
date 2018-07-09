@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GrandBazaar.Common\GrandBazaar.Common.csproj" />
     <ProjectReference Include="..\GrandBazaar.Domain\GrandBazaar.Domain.csproj" />
   </ItemGroup>
 
