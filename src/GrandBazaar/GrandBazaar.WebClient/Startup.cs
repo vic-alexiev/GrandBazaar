@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using GrandBazaar.WebClient.Data;
 using GrandBazaar.WebClient.Models;
 using GrandBazaar.WebClient.Services;
+using GrandBazaar.Domain;
+using System.IO;
 
 namespace GrandBazaar.WebClient
 {
@@ -69,6 +71,15 @@ namespace GrandBazaar.WebClient
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddMvc();
+
+            services.AddSingleton<IIpfsService, IpfsService>();
+            services.AddSingleton<IEthereumService>(scope =>
+            {
+                string url = "https://ropsten.infura.io/R13BuegiIhZLUGVL3Qdq";
+                string abi = File.ReadAllText("contractabi.json");
+                string contractAddress = "0x549ee4703e6beec593253e612bbb3d8c318808af";
+                return new EthereumService(url, abi, contractAddress);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

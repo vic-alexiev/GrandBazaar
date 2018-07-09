@@ -32,15 +32,19 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     <li>
                         @if (User.Identity.IsAuthenticated)
                         {
-                         @if (User.IsInRole("Admin"))
+                            @if (User.IsInRole("Admin"))
                             {
-                        <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>
+                                <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>
                             }
-                         }
+                            @if (User.IsInRole("Seller"))
+                            {
+                                <a asp-area="" asp-controller="Items" asp-action="Index">My Items</a>
+                            }
+                        }
                     </li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
