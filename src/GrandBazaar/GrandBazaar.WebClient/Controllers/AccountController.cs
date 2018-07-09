@@ -65,7 +65,7 @@ namespace GrandBazaar.WebClient.Controllers
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
+                    return RedirectToAction(nameof(LoginWith2FA), new { returnUrl, model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -85,7 +85,7 @@ namespace GrandBazaar.WebClient.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> LoginWith2fa(bool rememberMe, string returnUrl = null)
+        public async Task<IActionResult> LoginWith2FA(bool rememberMe, string returnUrl = null)
         {
             // Ensure the user has gone through the username & password screen first
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
@@ -95,7 +95,7 @@ namespace GrandBazaar.WebClient.Controllers
                 throw new ApplicationException($"Unable to load two-factor authentication user.");
             }
 
-            var model = new LoginWith2faViewModel { RememberMe = rememberMe };
+            var model = new LoginWith2FAViewModel { RememberMe = rememberMe };
             ViewData["ReturnUrl"] = returnUrl;
 
             return View(model);
@@ -104,7 +104,7 @@ namespace GrandBazaar.WebClient.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LoginWith2fa(LoginWith2faViewModel model, bool rememberMe, string returnUrl = null)
+        public async Task<IActionResult> LoginWith2FA(LoginWith2FAViewModel model, bool rememberMe, string returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
@@ -123,7 +123,7 @@ namespace GrandBazaar.WebClient.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("User with ID {UserId} logged in with 2fa.", user.Id);
+                _logger.LogInformation("User with ID {UserId} logged in with 2FA.", user.Id);
                 return RedirectToLocal(returnUrl);
             }
             else if (result.IsLockedOut)

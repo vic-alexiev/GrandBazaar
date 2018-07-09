@@ -319,7 +319,7 @@ namespace GrandBazaar.WebClient.Controllers
             var model = new TwoFactorAuthenticationViewModel
             {
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
-                Is2faEnabled = user.TwoFactorEnabled,
+                Is2FAEnabled = user.TwoFactorEnabled,
                 RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
             };
 
@@ -327,7 +327,7 @@ namespace GrandBazaar.WebClient.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Disable2faWarning()
+        public async Task<IActionResult> Disable2FAWarning()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -340,12 +340,12 @@ namespace GrandBazaar.WebClient.Controllers
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
 
-            return View(nameof(Disable2fa));
+            return View(nameof(Disable2FA));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Disable2fa()
+        public async Task<IActionResult> Disable2FA()
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -353,13 +353,13 @@ namespace GrandBazaar.WebClient.Controllers
                 throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
-            if (!disable2faResult.Succeeded)
+            var disable2FAResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+            if (!disable2FAResult.Succeeded)
             {
                 throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
             }
 
-            _logger.LogInformation("User with ID {UserId} has disabled 2fa.", user.Id);
+            _logger.LogInformation("User with ID {UserId} has disabled 2FA.", user.Id);
             return RedirectToAction(nameof(TwoFactorAuthentication));
         }
 
@@ -397,10 +397,10 @@ namespace GrandBazaar.WebClient.Controllers
             // Strip spaces and hypens
             var verificationCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-            var is2faTokenValid = await _userManager.VerifyTwoFactorTokenAsync(
+            var is2FATokenValid = await _userManager.VerifyTwoFactorTokenAsync(
                 user, _userManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
 
-            if (!is2faTokenValid)
+            if (!is2FATokenValid)
             {
                 ModelState.AddModelError("Code", "Verification code is invalid.");
                 await LoadSharedKeyAndQrCodeUriAsync(user, model);
