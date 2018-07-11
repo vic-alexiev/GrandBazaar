@@ -37,6 +37,12 @@
                         }
                     </li>
                     <li>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Customer"))
+                        {
+                            <a asp-area="Customer" asp-controller="Items" asp-action="Index">Items For Sale</a>
+                        }
+                    </li>
+                    <li>
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
                         {
                             <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>

@@ -1,21 +1,20 @@
-﻿using GrandBazaar.Common.Extensions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GrandBazaar.Common.Extensions;
 using GrandBazaar.Domain;
 using GrandBazaar.Domain.Models;
-using GrandBazaar.WebClient.Areas.Seller.Mappers;
-using GrandBazaar.WebClient.Areas.Seller.Models;
+using GrandBazaar.WebClient.Areas.Customer.Mappers;
 using GrandBazaar.WebClient.Controllers;
-using GrandBazaar.WebClient.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Nethereum.Hex.HexConvertors.Extensions;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace GrandBazaar.WebClient.Areas.Seller.Controllers
+namespace GrandBazaar.WebClient.Areas.Customer.Controllers
 {
-    [Area("Seller")]
-    [Authorize(Roles = "Seller")]
+    [Area("Customer")]
+    [Authorize(Roles = "Customer")]
     public class ItemsController : ItemsControllerBase
     {
         public ItemsController(
@@ -30,30 +29,24 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
         {
             string address = GetAccountAddressOrFail();
 
-            List<byte[]> sellerItems = await EthereumService
-                .GetItemsAsync(address)
+            List<byte[]> allItems = await EthereumService
+                .GetAllItemsAsync(address)
                 .ConfigureAwait(false);
-            if (sellerItems.IsNullOrEmpty())
+            if (allItems.IsNullOrEmpty())
             {
                 return View();
             }
 
             List<Item> items = await IpfsService
-                .GetItemsAsync(sellerItems)
+                .GetItemsAsync(allItems)
                 .ConfigureAwait(false);
             return View(items.ToViewModels());
         }
 
         // GET: Items/Details/5
-        public async Task<ActionResult> Details(string id)
+        public ActionResult Details(int id)
         {
-            byte[] itemId = id.HexToByteArray();
-            Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
-            int quantity = await EthereumService
-                .GetItemAvailabilityAsync(itemId)
-                .ConfigureAwait(false);
-
-            return View(item.ToViewModel(quantity));
+            return View();
         }
 
         // GET: Items/Create
@@ -65,31 +58,18 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
         // POST: Items/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateItemViewModel model, string returnUrl = null)
+        public ActionResult Create(IFormCollection collection)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            try
             {
-                IFormFile keystore =
-                    HttpContext.Request.Form.Files.GetFile("keystore");
-                if (keystore.Length == 0)
-                {
-                    return View(model);
-                }
+                // TODO: Add insert logic here
 
-                IReadOnlyList<IFormFile> images =
-                    HttpContext.Request.Form.Files.GetFiles("images");
-                Item item = model.ToDomainModel(images);
-                byte[] itemId = await IpfsService
-                    .AddItemAsync(item)
-                    .ConfigureAwait(false);
-                string txHash = await EthereumService
-                    .AddItemAsync(keystore.ReadAllText(), model.AccountPassword, itemId, model.Price, model.Quantity)
-                    .ConfigureAwait(false);
                 return RedirectToAction(nameof(Index));
             }
-
-            return View(model);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Items/Edit/5

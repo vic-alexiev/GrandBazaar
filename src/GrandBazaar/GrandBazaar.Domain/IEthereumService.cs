@@ -12,6 +12,8 @@ namespace GrandBazaar.Domain
             long price,
             int quantity);
 
+        Task<List<byte[]>> GetAllItemsAsync(string address);
+
         Task<List<byte[]>> GetItemsAsync(string address);
 
         Task<int> GetItemAvailabilityAsync(byte[] itemId);

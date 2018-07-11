@@ -50,6 +50,15 @@ namespace GrandBazaar.Domain
             return txHash;
         }
 
+        public async Task<List<byte[]>> GetAllItemsAsync(string address)
+        {
+            Function getItemsFunc = _contract.GetFunction("getAllItems");
+            List<byte[]> items = await getItemsFunc
+                .CallAsync<List<byte[]>>(address, Gas, new HexBigInteger(0))
+                .ConfigureAwait(false);
+            return items;
+        }
+
         public async Task<List<byte[]>> GetItemsAsync(string address)
         {
             Function getItemsFunc = _contract.GetFunction("getItems");

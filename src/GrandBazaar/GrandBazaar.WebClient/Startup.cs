@@ -11,6 +11,7 @@ using GrandBazaar.WebClient.Models;
 using GrandBazaar.WebClient.Services;
 using GrandBazaar.Domain;
 using System.IO;
+using GrandBazaar.WebClient.Filters;
 
 namespace GrandBazaar.WebClient
 {
@@ -70,7 +71,9 @@ namespace GrandBazaar.WebClient
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
-            services.AddMvc();
+            services.AddMvc(options =>
+                options.Filters.Add<AccountAddressFilter>()
+            );
 
             services.AddSingleton<IIpfsService, IpfsService>();
             services.AddSingleton<IEthereumService>(scope =>

@@ -8,7 +8,7 @@ using System.Linq;
 using DomainImage = GrandBazaar.Domain.Models.Image;
 using Image = GrandBazaar.WebClient.Areas.Seller.Models.Image;
 
-namespace GrandBazaar.WebClient.Mappers
+namespace GrandBazaar.WebClient.Areas.Seller.Mappers
 {
     public static class ModelFactory
     {
