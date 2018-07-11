@@ -34,7 +34,16 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Images</label>
-                <input type="file" name="files" multiple />
+                <input type="file" name="images" multiple />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Keystore file</label>
+                <input type="file" name="keystore" multiple />
+            </div>
+            <div class="form-group">
+                <label asp-for="KeystorePassword"></label>
+                <input asp-for="KeystorePassword" class="form-control" />
+                <span asp-validation-for="KeystorePassword" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />

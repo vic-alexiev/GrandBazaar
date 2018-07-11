@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GrandBazaar.Domain;
 using GrandBazaar.Domain.Models;
+using GrandBazaar.WebClient.Extensions;
 using GrandBazaar.WebClient.Mappers;
 using GrandBazaar.WebClient.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GrandBazaar.WebClient.Controllers
 {
+    [Authorize(Roles = "Seller")]
     public class ItemsController : Controller
     {
         IIpfsService _ipfsService;
@@ -51,10 +51,22 @@ namespace GrandBazaar.WebClient.Controllers
             {
                 try
                 {
-                    IFormFileCollection images = Request.Form.Files;
-                    Item item = model.ToDomainModel(images);
-                    string itemHash = await _ipfsService.AddItemAsync(item).ConfigureAwait(false);
+                    IFormFile keystore =
+                        HttpContext.Request.Form.Files.GetFile("keystore");
+                    if (keystore.Length == 0)
+                    {
+                        return View(model);
+                    }
 
+                    IReadOnlyList<IFormFile> images =
+                        HttpContext.Request.Form.Files.GetFiles("images");
+                    Item item = model.ToDomainModel(images);
+                    byte[] itemId = await _ipfsService
+                        .AddItemAsync(item)
+                        .ConfigureAwait(false);
+                    string txHash = await _ethereumService
+                        .AddItemAsync(keystore.ReadAllText(), model.KeystorePassword, itemId, model.Price, model.Quantity)
+                        .ConfigureAwait(false);
                     return RedirectToAction(nameof(Index));
                 }
                 catch

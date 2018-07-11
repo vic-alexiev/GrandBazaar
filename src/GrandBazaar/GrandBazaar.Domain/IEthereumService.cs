@@ -1,6 +1,14 @@
-﻿namespace GrandBazaar.Domain
+﻿using System.Threading.Tasks;
+
+namespace GrandBazaar.Domain
 {
     public interface IEthereumService
     {
+        Task<string> AddItemAsync(
+            string keystoreJson,
+            string keystorePassword,
+            byte[] itemId,
+            long price,
+            int quantity);
     }
 }

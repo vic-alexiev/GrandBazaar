@@ -9,7 +9,7 @@ namespace GrandBazaar.WebClient.Mappers
 {
     public static class ModelFactory
     {
-        public static Item ToDomainModel(this ItemViewModel model, IFormFileCollection images)
+        public static Item ToDomainModel(this ItemViewModel model, IReadOnlyList<IFormFile> images)
         {
             Item item = new Item
             {

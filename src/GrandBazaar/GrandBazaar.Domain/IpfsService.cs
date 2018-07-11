@@ -21,7 +21,7 @@ namespace GrandBazaar.Domain
             _ipfsClient = new IpfsClient();
         }
 
-        public async Task<string> AddItemAsync(Item item)
+        public async Task<byte[]> AddItemAsync(Item item)
         {
             string itemSerialized = JsonUtils.Serialize(item, false);
             byte[] itemBytes = Encoding.UTF8.GetBytes(itemSerialized);
@@ -35,8 +35,15 @@ namespace GrandBazaar.Domain
                     .AddAsync(stream, item.Name)
                     .ConfigureAwait(false);
 
-                string hash = ipfsNode.Id.Hash.ToString();
-                return hash;
+                byte[] digest = ipfsNode.Id.Hash.Digest;
+                //string hash = Encoding.GetString(digest);
+                //---------------------------------------------------
+                //MultiHash multiHash = new MultiHash(
+                //    MultiHash.DefaultAlgorithmName, Encoding.UTF8.GetBytes(hash));
+                //string a = multiHash.ToString();
+                //string b = ipfsNode.Id.Hash.ToString();
+
+                return digest;
             }
         }
     }

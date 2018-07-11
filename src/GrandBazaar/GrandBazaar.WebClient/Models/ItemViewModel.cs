@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace GrandBazaar.WebClient.Models
 {
@@ -13,8 +11,14 @@ namespace GrandBazaar.WebClient.Models
 
         public string Description { get; set; }
 
+        [Required, Range(1, long.MaxValue)]
         public long Price { get; set; }
 
+        [Required, Range(1, int.MaxValue)]
         public int Quantity { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string KeystorePassword { get; set; }
     }
 }

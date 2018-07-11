@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GrandBazaar.WebClient.Data.Migrations
 {
+    // Source:
+    // https://code.msdn.microsoft.com/Getting-Started-With-e98e08b9
     public partial class CreateIdentitySchema : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
