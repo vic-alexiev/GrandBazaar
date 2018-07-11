@@ -42,10 +42,34 @@
         </dd>
     </dl>
 </div>
-<div>
-    @foreach (var image in Model.Images)
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+    @if (Model.Images.Count > 1)
     {
-        <img src='data:image/png;base64,@image.DataBase64Encoded' alt="@image.Name" height="200" width="200" />
+        <ol class="carousel-indicators">
+            @for (int index = 0; index < Model.Images.Count; index++)
+            {
+                <li data-target="#myCarousel" data-slide-to="@index" class="@(index == 0 ? "active" : "")"></li>
+            }
+        </ol>
+    }
+    <div class="carousel-inner" role="listbox">
+        @for (int index = 0; index < Model.Images.Count; index++)
+        {
+            <div class="item @(index == 0 ? "active" : "")">
+                <img src='data:image/png;base64,@Model.Images[index].DataBase64Encoded' alt="@Model.Images[index].Name" class="img-responsive" />
+            </div>
+        }
+    </div>
+    @if (Model.Images.Count > 1)
+    {
+        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
     }
 </div>
 <div>
