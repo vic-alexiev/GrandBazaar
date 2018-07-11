@@ -1,4 +1,4 @@
-﻿namespace GrandBazaar.WebClient.Models.Items
+﻿namespace GrandBazaar.WebClient.Areas.Seller.Models
 {
     public class Image
     {

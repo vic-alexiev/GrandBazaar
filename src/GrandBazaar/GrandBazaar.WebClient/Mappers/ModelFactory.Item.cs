@@ -1,12 +1,12 @@
 ﻿using GrandBazaar.Domain.Models;
-using GrandBazaar.WebClient.Models.Items;
+using GrandBazaar.WebClient.Areas.Seller.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using DomainImage = GrandBazaar.Domain.Models.Image;
-using Image = GrandBazaar.WebClient.Models.Items.Image;
+using Image = GrandBazaar.WebClient.Areas.Seller.Models.Image;
 
 namespace GrandBazaar.WebClient.Mappers
 {

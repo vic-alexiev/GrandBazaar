@@ -1,6 +1,6 @@
 ﻿@using GrandBazaar.Common.Extensions;
 
-@model IEnumerable<GrandBazaar.WebClient.Models.Items.ItemViewModel>
+@model IEnumerable<GrandBazaar.WebClient.Areas.Seller.Models.ItemViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -36,7 +36,7 @@
             {
                 <tr>
                     <td>
-                        <a href="http://localhost:5001/ipfs/QmQLXHs7K98JNQdWrBB2cQLJahPhmupbDjRuH1b9ibmwVa/?#/objects/ipfs/@item.Id" target="_blank">
+                        <a href="http://localhost:5001/ipfs/QmQLXHs7K98JNQdWrBB2cQLJahPhmupbDjRuH1b9ibmwVa/?#/objects/ipfs/@item.IpfsHash" target="_blank">
                             @item.IpfsHash
                         </a>
                     </td>
@@ -50,9 +50,9 @@
                         @Html.DisplayFor(modelItem => item.Price)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                        @Html.ActionLink("Edit", "Edit", new { area = "Seller"/*, id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Details", "Details", new { area = "Seller", id = item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { area = "Seller"/*, id=item.PrimaryKey */ })
                     </td>
                 </tr>
             }

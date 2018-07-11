@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using GrandBazaar.Common.Extensions;
+﻿using GrandBazaar.Common.Extensions;
 using GrandBazaar.Domain;
 using GrandBazaar.Domain.Models;
+using GrandBazaar.WebClient.Areas.Seller.Models;
 using GrandBazaar.WebClient.Extensions;
 using GrandBazaar.WebClient.Mappers;
-using GrandBazaar.WebClient.Models.Items;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nethereum.Hex.HexConvertors.Extensions;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace GrandBazaar.WebClient.Controllers
+namespace GrandBazaar.WebClient.Areas.Seller.Controllers
 {
+    [Area("Seller")]
     [Authorize(Roles = "Seller")]
     public class ItemsController : Controller
     {
