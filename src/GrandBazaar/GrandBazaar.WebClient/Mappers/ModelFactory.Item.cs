@@ -42,15 +42,16 @@ namespace GrandBazaar.WebClient.Mappers
             return item;
         }
 
-        public static ItemViewModel ToViewModel(this Item model)
+        public static ItemViewModel ToViewModel(this Item model, int? quantity = null)
         {
             return new ItemViewModel
             {
                 Id = model.Id,
+                IpfsHash = model.IpfsHash,
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
-                Quantity = model.Quantity,
+                Quantity = quantity ?? model.Quantity,
                 Images = model.Images.Select(image => new Image
                 {
                     Name = image.Name,

@@ -3,6 +3,7 @@ using GrandBazaar.Common.Extensions;
 using GrandBazaar.Domain.Models;
 using Ipfs;
 using Ipfs.Api;
+using Nethereum.Hex.HexConvertors.Extensions;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -38,12 +39,17 @@ namespace GrandBazaar.Domain
             }
         }
 
-        public async Task<Item> GetItemAsync(string path)
+        public async Task<Item> GetItemAsync(byte[] itemId)
         {
+            MultiHash multiHash = new MultiHash(
+                MultiHash.DefaultAlgorithmName,
+                itemId);
+            string hash = multiHash.ToString();
+
             Item item = null;
             using (Stream stream = await _ipfsClient
                         .FileSystem
-                        .ReadFileAsync(path)
+                        .ReadFileAsync(hash)
                         .ConfigureAwait(false))
             using (MemoryStream memoryStream = new MemoryStream())
             {
@@ -53,24 +59,21 @@ namespace GrandBazaar.Domain
                 {
                     string content = Encoding.UTF8.GetString(data);
                     item = JsonUtils.Deserialize<Item>(content);
-                    item.Id = path;
+                    item.Id = itemId.ToHex();
+                    item.IpfsHash = hash;
                 }
 
                 return item;
             }
         }
 
-        public async Task<List<Item>> GetItemsAsync(List<byte[]> itemDigests)
+        public async Task<List<Item>> GetItemsAsync(List<byte[]> itemIds)
         {
             List<Item> items = new List<Item>();
 
-            foreach (byte[] digest in itemDigests)
+            foreach (byte[] itemId in itemIds)
             {
-                MultiHash multiHash = new MultiHash(
-                    MultiHash.DefaultAlgorithmName, digest);
-                string path = multiHash.ToString();
-
-                Item item = await GetItemAsync(path).ConfigureAwait(false);
+                Item item = await GetItemAsync(itemId).ConfigureAwait(false);
                 if (item != null)
                 {
                     items.Add(item);

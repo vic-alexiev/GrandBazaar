@@ -1,12 +1,8 @@
 ﻿using Nethereum.Contracts;
-using Nethereum.HdWallet;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
-using Nethereum.Web3.Accounts.Managed;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace GrandBazaar.Domain
@@ -38,28 +34,20 @@ namespace GrandBazaar.Domain
             long price,
             int quantity)
         {
-            try
-            {
-                Account account = GetAccount(keystoreJson, password);
-                Contract contract = GetContract(account);
-                Function addItemFunc = contract.GetFunction("addItem");
-                object[] functionInput = new object[] { itemId, price, quantity };
+            Account account = GetAccount(keystoreJson, password);
+            Contract contract = GetContract(account);
+            Function addItemFunc = contract.GetFunction("addItem");
+            object[] input = new object[] { itemId, price, quantity };
 
-                string txHash = await addItemFunc
-                    .SendTransactionAsync(
-                    account.Address,
-                    Gas,
-                    new HexBigInteger(0),
-                    functionInput: functionInput)
-                    .ConfigureAwait(false);
+            string txHash = await addItemFunc
+                .SendTransactionAsync(
+                account.Address,
+                Gas,
+                new HexBigInteger(0),
+                functionInput: input)
+                .ConfigureAwait(false);
 
-                return txHash;
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-                throw;
-            }
+            return txHash;
         }
 
         public async Task<List<byte[]>> GetItemsAsync(string address)
@@ -69,6 +57,17 @@ namespace GrandBazaar.Domain
                 .CallAsync<List<byte[]>>(address, Gas, new HexBigInteger(0))
                 .ConfigureAwait(false);
             return items;
+        }
+
+        public async Task<int> GetItemAvailabilityAsync(byte[] itemId)
+        {
+            Function getItemsFunc = _contract.GetFunction("availability");
+            object[] input = new object[] { itemId };
+
+            int availability = await getItemsFunc
+                .CallAsync<int>(functionInput: input)
+                .ConfigureAwait(false);
+            return availability;
         }
 
         private Account GetAccount(

@@ -9,6 +9,7 @@ using GrandBazaar.WebClient.Models.Items;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Nethereum.Hex.HexConvertors.Extensions;
 
 namespace GrandBazaar.WebClient.Controllers
 {
@@ -52,8 +53,13 @@ namespace GrandBazaar.WebClient.Controllers
         // GET: Items/Details/5
         public async Task<ActionResult> Details(string id)
         {
-            Item item = await _ipfsService.GetItemAsync(id).ConfigureAwait(false);
-            return View(item.ToViewModel());
+            byte[] itemId = id.HexToByteArray();
+            Item item = await _ipfsService.GetItemAsync(itemId).ConfigureAwait(false);
+            int quantity = await _ethereumService
+                .GetItemAvailabilityAsync(itemId)
+                .ConfigureAwait(false);
+
+            return View(item.ToViewModel(quantity));
         }
 
         // GET: Items/Create
@@ -70,30 +76,23 @@ namespace GrandBazaar.WebClient.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                try
-                {
-                    IFormFile keystore =
-                        HttpContext.Request.Form.Files.GetFile("keystore");
-                    if (keystore.Length == 0)
-                    {
-                        return View(model);
-                    }
-
-                    IReadOnlyList<IFormFile> images =
-                        HttpContext.Request.Form.Files.GetFiles("images");
-                    Item item = model.ToDomainModel(images);
-                    byte[] itemId = await _ipfsService
-                        .AddItemAsync(item)
-                        .ConfigureAwait(false);
-                    string txHash = await _ethereumService
-                        .AddItemAsync(keystore.ReadAllText(), model.AccountPassword, itemId, model.Price, model.Quantity)
-                        .ConfigureAwait(false);
-                    return RedirectToAction(nameof(Index));
-                }
-                catch
+                IFormFile keystore =
+                    HttpContext.Request.Form.Files.GetFile("keystore");
+                if (keystore.Length == 0)
                 {
                     return View(model);
                 }
+
+                IReadOnlyList<IFormFile> images =
+                    HttpContext.Request.Form.Files.GetFiles("images");
+                Item item = model.ToDomainModel(images);
+                byte[] itemId = await _ipfsService
+                    .AddItemAsync(item)
+                    .ConfigureAwait(false);
+                string txHash = await _ethereumService
+                    .AddItemAsync(keystore.ReadAllText(), model.AccountPassword, itemId, model.Price, model.Quantity)
+                    .ConfigureAwait(false);
+                return RedirectToAction(nameof(Index));
             }
 
             return View(model);

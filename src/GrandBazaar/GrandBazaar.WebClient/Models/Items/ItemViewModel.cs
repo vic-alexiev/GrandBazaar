@@ -6,6 +6,8 @@ namespace GrandBazaar.WebClient.Models.Items
     {
         public string Id { get; set; }
 
+        public string IpfsHash { get; set; }
+
         public string Name { get; set; }
 
         public string Description { get; set; }
