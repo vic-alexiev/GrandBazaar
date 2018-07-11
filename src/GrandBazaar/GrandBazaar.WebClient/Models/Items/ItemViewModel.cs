@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace GrandBazaar.Domain.Models
+namespace GrandBazaar.WebClient.Models.Items
 {
-    public class Item
+    public class ItemViewModel
     {
         public string Id { get; set; }
 

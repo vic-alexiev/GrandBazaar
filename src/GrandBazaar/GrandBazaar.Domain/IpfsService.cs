@@ -1,10 +1,8 @@
 ﻿using GrandBazaar.Common;
-using GrandBazaar.Domain.Mappers;
+using GrandBazaar.Common.Extensions;
 using GrandBazaar.Domain.Models;
 using Ipfs;
 using Ipfs.Api;
-using Ipfs.CoreApi;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -36,15 +34,40 @@ namespace GrandBazaar.Domain
                     .ConfigureAwait(false);
 
                 byte[] digest = ipfsNode.Id.Hash.Digest;
-                //string hash = Encoding.GetString(digest);
-                //---------------------------------------------------
-                //MultiHash multiHash = new MultiHash(
-                //    MultiHash.DefaultAlgorithmName, Encoding.UTF8.GetBytes(hash));
-                //string a = multiHash.ToString();
-                //string b = ipfsNode.Id.Hash.ToString();
-
                 return digest;
             }
+        }
+
+        public async Task<List<Item>> GetItemsAsync(List<byte[]> itemDigests)
+        {
+            List<Item> items = new List<Item>();
+
+            foreach (byte[] digest in itemDigests)
+            {
+                MultiHash multiHash = new MultiHash(
+                    MultiHash.DefaultAlgorithmName, digest);
+                string path = multiHash.ToString();
+
+                using (Stream stream = await _ipfsClient
+                        .FileSystem
+                        .ReadFileAsync(path)
+                        .ConfigureAwait(false))
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    byte[] data = memoryStream.ToArray();
+                    if (!data.IsNullOrEmpty())
+                    {
+                        string content = Encoding.UTF8.GetString(data);
+                        Item item = JsonUtils.Deserialize<Item>(content);
+                        item.Id = path;
+
+                        items.Add(item);
+                    }
+                }
+            }
+
+            return items;
         }
     }
 }

@@ -18,8 +18,8 @@ namespace GrandBazaar.Domain
         private readonly string ContractAbi;
         private readonly string ContractAddress;
 
-        //private Web3 _web3;
-        //private Contract _contract;
+        private Web3 _web3;
+        private Contract _contract;
 
         public EthereumService(string url, string contractAbi, string contractAddress)
         {
@@ -27,8 +27,8 @@ namespace GrandBazaar.Domain
             ContractAbi = contractAbi;
             ContractAddress = contractAddress;
 
-            //_web3 = new Web3(account, url);
-            //_contract = _web3.Eth.GetContract(abi, contractAddress);
+            _web3 = new Web3(url);
+            _contract = _web3.Eth.GetContract(contractAbi, contractAddress);
         }
 
         public async Task<string> AddItemAsync(
@@ -60,6 +60,15 @@ namespace GrandBazaar.Domain
                 string message = ex.Message;
                 throw;
             }
+        }
+
+        public async Task<List<byte[]>> GetItemsAsync(string address)
+        {
+            Function getItemsFunc = _contract.GetFunction("getItems");
+            List<byte[]> items = await getItemsFunc
+                .CallAsync<List<byte[]>>(address, Gas, new HexBigInteger(0))
+                .ConfigureAwait(false);
+            return items;
         }
 
         private Account GetAccount(

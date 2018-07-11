@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GrandBazaar.Domain
 {
@@ -10,5 +11,7 @@ namespace GrandBazaar.Domain
             byte[] itemId,
             long price,
             int quantity);
+
+        Task<List<byte[]>> GetItemsAsync(string address);
     }
 }

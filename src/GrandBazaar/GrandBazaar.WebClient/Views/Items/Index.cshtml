@@ -1,6 +1,6 @@
 ﻿@using GrandBazaar.Common.Extensions;
 
-@model IEnumerable<GrandBazaar.WebClient.Models.ItemViewModel>
+@model IEnumerable<GrandBazaar.WebClient.Models.Items.ItemViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -39,7 +39,9 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Id)
+                        <a href="http://localhost:5001/ipfs/QmQLXHs7K98JNQdWrBB2cQLJahPhmupbDjRuH1b9ibmwVa/?#/objects/ipfs/@item.Id" target="_blank">
+                            @item.Id
+                        </a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)

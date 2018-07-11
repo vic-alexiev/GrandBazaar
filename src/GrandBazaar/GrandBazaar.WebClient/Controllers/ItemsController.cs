@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using GrandBazaar.Common.Extensions;
 using GrandBazaar.Domain;
 using GrandBazaar.Domain.Models;
 using GrandBazaar.WebClient.Extensions;
 using GrandBazaar.WebClient.Mappers;
-using GrandBazaar.WebClient.Models;
+using GrandBazaar.WebClient.Models.Items;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +25,28 @@ namespace GrandBazaar.WebClient.Controllers
         }
 
         // GET: Items
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            bool userAccountIsUnlocked =
+                HttpContext.Request.Cookies
+                    .TryGetValue("web3-account", out string address);
+            if (!userAccountIsUnlocked)
+            {
+                return View();
+            }
+
+            List<byte[]> sellerItems = await _ethereumService
+                .GetItemsAsync(address)
+                .ConfigureAwait(false);
+            if (sellerItems.IsNullOrEmpty())
+            {
+                return View();
+            }
+
+            List<Item> items = await _ipfsService
+                .GetItemsAsync(sellerItems)
+                .ConfigureAwait(false);
+            return View(items.ToViewModels());
         }
 
         // GET: Items/Details/5
@@ -44,7 +64,7 @@ namespace GrandBazaar.WebClient.Controllers
         // POST: Items/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(ItemViewModel model, string returnUrl = null)
+        public async Task<ActionResult> Create(CreateItemViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -65,7 +85,7 @@ namespace GrandBazaar.WebClient.Controllers
                         .AddItemAsync(item)
                         .ConfigureAwait(false);
                     string txHash = await _ethereumService
-                        .AddItemAsync(keystore.ReadAllText(), model.KeystorePassword, itemId, model.Price, model.Quantity)
+                        .AddItemAsync(keystore.ReadAllText(), model.AccountPassword, itemId, model.Price, model.Quantity)
                         .ConfigureAwait(false);
                     return RedirectToAction(nameof(Index));
                 }

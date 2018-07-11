@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GrandBazaar.WebClient.Models
+namespace GrandBazaar.WebClient.Models.Items
 {
-    public class ItemViewModel
+    public class CreateItemViewModel
     {
         public string Id { get; set; }
 
@@ -19,6 +19,6 @@ namespace GrandBazaar.WebClient.Models
 
         [Required]
         [DataType(DataType.Password)]
-        public string KeystorePassword { get; set; }
+        public string AccountPassword { get; set; }
     }
 }
