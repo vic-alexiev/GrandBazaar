@@ -50,9 +50,10 @@ namespace GrandBazaar.WebClient.Controllers
         }
 
         // GET: Items/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(string id)
         {
-            return View();
+            Item item = await _ipfsService.GetItemAsync(id).ConfigureAwait(false);
+            return View(item.ToViewModel());
         }
 
         // GET: Items/Create

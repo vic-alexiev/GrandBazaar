@@ -8,6 +8,8 @@ namespace GrandBazaar.Domain
     {
         Task<byte[]> AddItemAsync(Item item);
 
+        Task<Item> GetItemAsync(string path);
+
         Task<List<Item>> GetItemsAsync(List<byte[]> itemDigests);
     }
 }

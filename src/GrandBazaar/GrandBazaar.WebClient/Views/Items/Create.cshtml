@@ -4,9 +4,9 @@
     ViewData["Title"] = "Add item";
 }
 
-<h2>View</h2>
+<h2>New item</h2>
 
-<h4>ItemViewModel</h4>
+<h4>Fill in the form</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -34,11 +34,11 @@
             </div>
             <div class="form-group">
                 <label class="control-label">Images</label>
-                <input type="file" name="images" multiple />
+                <input type="file" name="images" accept="image/*" multiple />
             </div>
             <div class="form-group">
                 <label class="control-label">Keystore file</label>
-                <input type="file" name="keystore" multiple />
+                <input type="file" name="keystore" />
             </div>
             <div class="form-group">
                 <label asp-for="AccountPassword"></label>

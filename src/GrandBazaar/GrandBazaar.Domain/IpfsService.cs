@@ -38,6 +38,28 @@ namespace GrandBazaar.Domain
             }
         }
 
+        public async Task<Item> GetItemAsync(string path)
+        {
+            Item item = null;
+            using (Stream stream = await _ipfsClient
+                        .FileSystem
+                        .ReadFileAsync(path)
+                        .ConfigureAwait(false))
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                byte[] data = memoryStream.ToArray();
+                if (!data.IsNullOrEmpty())
+                {
+                    string content = Encoding.UTF8.GetString(data);
+                    item = JsonUtils.Deserialize<Item>(content);
+                    item.Id = path;
+                }
+
+                return item;
+            }
+        }
+
         public async Task<List<Item>> GetItemsAsync(List<byte[]> itemDigests)
         {
             List<Item> items = new List<Item>();
@@ -48,22 +70,10 @@ namespace GrandBazaar.Domain
                     MultiHash.DefaultAlgorithmName, digest);
                 string path = multiHash.ToString();
 
-                using (Stream stream = await _ipfsClient
-                        .FileSystem
-                        .ReadFileAsync(path)
-                        .ConfigureAwait(false))
-                using (MemoryStream memoryStream = new MemoryStream())
+                Item item = await GetItemAsync(path).ConfigureAwait(false);
+                if (item != null)
                 {
-                    stream.CopyTo(memoryStream);
-                    byte[] data = memoryStream.ToArray();
-                    if (!data.IsNullOrEmpty())
-                    {
-                        string content = Encoding.UTF8.GetString(data);
-                        Item item = JsonUtils.Deserialize<Item>(content);
-                        item.Id = path;
-
-                        items.Add(item);
-                    }
+                    items.Add(item);
                 }
             }
 
