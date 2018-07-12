@@ -5,14 +5,21 @@ namespace GrandBazaar.Domain
 {
     public interface IEthereumService
     {
-        Task<string> AddItemAsync(
+        Task<string> PurchaseAsync(
             string keystoreJson,
-            string keystorePassword,
+            string password,
             byte[] itemId,
             long price,
             int quantity);
 
-        Task<List<byte[]>> GetAllItemsAsync(string address);
+        Task<string> AddItemAsync(
+            string keystoreJson,
+            string password,
+            byte[] itemId,
+            long price,
+            int quantity);
+
+        Task<List<byte[]>> GetAllItemsAsync();
 
         Task<List<byte[]>> GetItemsAsync(string address);
 

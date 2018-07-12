@@ -27,6 +27,30 @@ namespace GrandBazaar.Domain
             _contract = _web3.Eth.GetContract(contractAbi, contractAddress);
         }
 
+        public async Task<string> PurchaseAsync(
+            string keystoreJson,
+            string password,
+            byte[] itemId,
+            long price,
+            int quantity)
+        {
+            Account account = GetAccount(keystoreJson, password);
+            Contract contract = GetContract(account);
+            Function purchaseFunc = contract.GetFunction("purchase");
+            object[] input = new object[] { itemId, quantity };
+
+            long amount = price * quantity;
+            string txHash = await purchaseFunc
+                .SendTransactionAsync(
+                account.Address,
+                Gas,
+                new HexBigInteger(amount),
+                functionInput: input)
+                .ConfigureAwait(false);
+
+            return txHash;
+        }
+
         public async Task<string> AddItemAsync(
             string keystoreJson,
             string password,
@@ -50,11 +74,11 @@ namespace GrandBazaar.Domain
             return txHash;
         }
 
-        public async Task<List<byte[]>> GetAllItemsAsync(string address)
+        public async Task<List<byte[]>> GetAllItemsAsync()
         {
             Function getItemsFunc = _contract.GetFunction("getAllItems");
             List<byte[]> items = await getItemsFunc
-                .CallAsync<List<byte[]>>(address, Gas, new HexBigInteger(0))
+                .CallAsync<List<byte[]>>()
                 .ConfigureAwait(false);
             return items;
         }

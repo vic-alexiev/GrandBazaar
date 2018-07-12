@@ -83,8 +83,13 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
                 byte[] itemId = await IpfsService
                     .AddItemAsync(item)
                     .ConfigureAwait(false);
-                string txHash = await EthereumService
-                    .AddItemAsync(keystore.ReadAllText(), model.AccountPassword, itemId, model.Price, model.Quantity)
+
+                string txHash = await EthereumService.AddItemAsync(
+                    keystore.ReadAllText(),
+                    model.AccountPassword,
+                    itemId,
+                    model.Price,
+                    model.Quantity)
                     .ConfigureAwait(false);
                 return RedirectToAction(nameof(Index));
             }
