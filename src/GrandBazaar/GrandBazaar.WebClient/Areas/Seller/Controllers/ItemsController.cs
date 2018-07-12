@@ -91,6 +91,9 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
                     model.Price,
                     model.Quantity)
                     .ConfigureAwait(false);
+                string txUrl = EthereumService.GetTxUrl(txHash);
+
+                TempData["SuccessMessage"] = $"Item added successfully! {txUrl}";
                 return RedirectToAction(nameof(Index));
             }
 

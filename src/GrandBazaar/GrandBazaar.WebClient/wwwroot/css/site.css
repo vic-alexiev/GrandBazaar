@@ -39,3 +39,26 @@
     margin: 0 auto;
     padding-top: 20px;
 }
+
+#infoBox {
+    display: none;
+    padding: 20px 5px;
+    width: 80%;
+    margin: 10px auto;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 3px;
+    background: #393;
+}
+
+    #infoBox > header {
+        float: right;
+        margin-right: 5px;
+    }
+
+        #infoBox > header:hover {
+            transition: all 0.2s;
+            font-weight: bold;
+            cursor: pointer;
+        }

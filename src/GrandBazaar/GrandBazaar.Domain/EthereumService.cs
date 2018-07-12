@@ -13,18 +13,29 @@ namespace GrandBazaar.Domain
         private readonly string Url;
         private readonly string ContractAbi;
         private readonly string ContractAddress;
+        private readonly string EtherscanUrl;
 
         private Web3 _web3;
         private Contract _contract;
 
-        public EthereumService(string url, string contractAbi, string contractAddress)
+        public EthereumService(
+            string url,
+            string contractAbi,
+            string contractAddress,
+            string etherscanUrl)
         {
             Url = url;
             ContractAbi = contractAbi;
             ContractAddress = contractAddress;
+            EtherscanUrl = etherscanUrl;
 
             _web3 = new Web3(url);
             _contract = _web3.Eth.GetContract(contractAbi, contractAddress);
+        }
+
+        public string GetTxUrl(string txHash)
+        {
+            return $"{EtherscanUrl.TrimEnd('/')}/{txHash}";
         }
 
         public async Task<string> PurchaseAsync(

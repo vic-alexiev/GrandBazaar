@@ -4,6 +4,21 @@
     ViewData["Title"] = "Index";
 }
 
+@section Scripts{
+    <script>
+        function showInfo(message) {
+            $('#infoBox>p').html(message);
+            $('#infoBox').show();
+            $('#infoBox>header').click(function () { $('#infoBox').hide(); });
+        }
+    </script>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>showInfo('@TempData["SuccessMessage"]')</script>
+    }
+}
+
+<section id="infoBox"><header>x</header><p>Info</p></section>
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
     <div class="carousel-inner" role="listbox">
         @for (int index = 0; index < Model.Count; index++)

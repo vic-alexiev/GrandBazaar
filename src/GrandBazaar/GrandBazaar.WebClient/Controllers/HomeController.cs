@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using GrandBazaar.WebClient.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GrandBazaar.WebClient.Controllers
 {
@@ -25,6 +26,7 @@ namespace GrandBazaar.WebClient.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
