@@ -8,20 +8,22 @@
 
 @section Scripts{
     <script>
-        function showInfo(message) {
-            $('#infoBox>p').html(message);
+        function showTxInfo(url) {
+            $('#infoBox>p').html(`Transaction hash: <a href="${url}" target="_blank">${url}</a>`);
             $('#infoBox').show();
             $('#infoBox>header').click(function () { $('#infoBox').hide(); });
         }
     </script>
-    @if (TempData["SuccessMessage"] != null)
+    @if (TempData["TxInfo"] != null)
     {
-        <script>showInfo('@TempData["SuccessMessage"]')</script>
+        <script>showTxInfo('@TempData["TxInfo"]')</script>
     }
 }
 
-<h2>Index</h2>
 <section id="infoBox"><header>x</header><p>Info</p></section>
+
+<h2>Index</h2>
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>

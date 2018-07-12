@@ -52,6 +52,14 @@
     background: #393;
 }
 
+    #infoBox > p > a {
+        color: white;
+    }
+
+        #infoBox > p > a:hover {
+            color: white;
+        }
+
     #infoBox > header {
         float: right;
         margin-right: 5px;

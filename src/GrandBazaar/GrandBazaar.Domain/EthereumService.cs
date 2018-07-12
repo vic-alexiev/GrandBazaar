@@ -33,9 +33,9 @@ namespace GrandBazaar.Domain
             _contract = _web3.Eth.GetContract(contractAbi, contractAddress);
         }
 
-        public string GetTxUrl(string txHash)
+        public string GetTransactionUrl(string hash)
         {
-            return $"{EtherscanUrl.TrimEnd('/')}/{txHash}";
+            return $"{EtherscanUrl.TrimEnd('/')}/{hash}";
         }
 
         public async Task<string> PurchaseAsync(

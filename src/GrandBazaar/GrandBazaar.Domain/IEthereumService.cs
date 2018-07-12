@@ -5,7 +5,7 @@ namespace GrandBazaar.Domain
 {
     public interface IEthereumService
     {
-        string GetTxUrl(string txHash);
+        string GetTransactionUrl(string hash);
 
         Task<string> PurchaseAsync(
             string keystoreJson,
