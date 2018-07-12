@@ -80,7 +80,7 @@ namespace GrandBazaar.WebClient
             {
                 string url = "https://ropsten.infura.io/R13BuegiIhZLUGVL3Qdq";
                 string abi = File.ReadAllText("contractabi.json");
-                string contractAddress = "0x549ee4703e6beec593253e612bbb3d8c318808af";
+                string contractAddress = "0xfecbe56b42eafa213461c70e6babf54750375570";
                 return new EthereumService(url, abi, contractAddress);
             });
         }
