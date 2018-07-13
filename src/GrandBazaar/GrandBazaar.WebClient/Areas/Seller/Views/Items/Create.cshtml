@@ -4,6 +4,13 @@
     ViewData["Title"] = "Add item";
 }
 
+@section Scripts{
+    @if (TempData["Error"] != null)
+    {
+        <script>grandBazaar.showError('@TempData["Error"]')</script>
+    }
+}
+
 <h2>New item</h2>
 
 <h4>Fill in the form</h4>

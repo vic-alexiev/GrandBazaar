@@ -40,7 +40,7 @@
     padding-top: 20px;
 }
 
-a.btn-purchase::after{
+a.btn-purchase::after {
     content: ' |'
 }
 
@@ -56,11 +56,11 @@ a.btn-purchase::after{
 }
 
 #infoBox {
-    background: #393;
+    background: #00B239;
 }
 
 #errorBox {
-    background: #F50;
+    background: #A94442;
 }
 
 #infoBox > p > a,

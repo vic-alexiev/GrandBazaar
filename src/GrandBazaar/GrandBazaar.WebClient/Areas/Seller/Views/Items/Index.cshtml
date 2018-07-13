@@ -11,6 +11,11 @@
     {
         <script>grandBazaar.showTxInfo('@TempData["TxInfo"]')</script>
     }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>grandBazaar.showError('@TempData["Error"]')</script>
+    }
 }
 
 <h2>Index</h2>

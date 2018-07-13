@@ -1,8 +1,7 @@
 ﻿using GrandBazaar.Domain;
+using GrandBazaar.WebClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GrandBazaar.WebClient.Controllers
@@ -46,9 +45,19 @@ namespace GrandBazaar.WebClient.Controllers
             }
             catch (Exception ex)
             {
-                TempData["Error"] = ex.Message;
+                ShowError(ex.Message);
                 return View(model);
             }
+        }
+
+        public void ShowTransactionInfo(string hash)
+        {
+            TempData["TxInfo"] = EthereumService.GetTransactionUrl(hash);
+        }
+
+        public void ShowError(string message)
+        {
+            TempData["Error"] = message;
         }
     }
 }

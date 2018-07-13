@@ -22,6 +22,8 @@ namespace GrandBazaar.Domain
             long price,
             int quantity);
 
+        Task<bool> CheckItemExistsAsync(byte[] itemId);
+
         Task<ItemDetails> GetItemDetailsAsync(byte[] itemId);
 
         Task<List<byte[]>> GetAllItemsAsync();

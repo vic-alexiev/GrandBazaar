@@ -4,8 +4,6 @@ namespace GrandBazaar.WebClient.Areas.Customer.Models
 {
     public class PurchaseItemViewModel
     {
-        public string SellerAddress { get; set; }
-
         [Required]
         public string Id { get; set; }
 
@@ -18,5 +16,11 @@ namespace GrandBazaar.WebClient.Areas.Customer.Models
         [Required]
         [DataType(DataType.Password)]
         public string AccountPassword { get; set; }
+
+        public string SellerAddress { get; set; }
+
+        public bool InStock { get; set; }
+
+        public bool Valid { get; set; }
     }
 }

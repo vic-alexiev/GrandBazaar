@@ -17,5 +17,7 @@ namespace GrandBazaar.WebClient.Areas.Seller.Models
         public int Quantity { get; set; }
 
         public List<Image> Images { get; set; }
+
+        public bool Valid { get; set; }
     }
 }

@@ -9,6 +9,11 @@
     {
         <script>grandBazaar.showTxInfo('@TempData["TxInfo"]')</script>
     }
+
+    @if (TempData["Error"] != null)
+    {
+        <script>grandBazaar.showError('@TempData["Error"]')</script>
+    }
 }
 
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">

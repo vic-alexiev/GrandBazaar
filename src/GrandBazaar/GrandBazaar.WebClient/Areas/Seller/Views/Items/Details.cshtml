@@ -4,65 +4,78 @@
     ViewData["Title"] = "Details";
 }
 
+@section Scripts{
+    @if (TempData["Error"] != null)
+    {
+        <script>grandBazaar.showError('@TempData["Error"]')</script>
+    }
+}
+
 <h2>Details</h2>
 
-<div>
-    <h4>@Model.Name</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.IpfsHash)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.IpfsHash)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-    </dl>
-</div>
-<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
-    <div class="carousel-inner" role="listbox">
-        @for (int index = 0; index < Model.Images.Count; index++)
-        {
-            <div class="item @(index == 0 ? "active" : "")">
-                <img src='data:image/png;base64,@Model.Images[index].DataBase64Encoded' alt="@Model.Images[index].Name" class="img-responsive" />
-            </div>
-        }
+@if (Model.Valid)
+{
+    <div>
+        <h4>@Model.Name</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.IpfsHash)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.IpfsHash)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Price)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+        </dl>
     </div>
-    @if (Model.Images.Count > 1)
+    @if (!Model.Images.IsNullOrEmpty())
     {
-        <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>
+        <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+            <div class="carousel-inner" role="listbox">
+                @for (int index = 0; index < Model.Images.Count; index++)
+                {
+                    <div class="item @(index == 0 ? "active" : "")">
+                        <img src='data:image/png;base64,@Model.Images[index].DataBase64Encoded' alt="@Model.Images[index].Name" class="img-responsive" />
+                    </div>
+                }
+            </div>
+            @if (Model.Images.Count > 1)
+            {
+                <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            }
+        </div>
     }
-</div>
+}
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

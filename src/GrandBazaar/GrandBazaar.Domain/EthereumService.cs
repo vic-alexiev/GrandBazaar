@@ -1,9 +1,9 @@
-﻿using GrandBazaar.Domain.Models;
+﻿using GrandBazaar.Domain.Extensions;
+using GrandBazaar.Domain.Models;
 using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -85,6 +85,14 @@ namespace GrandBazaar.Domain
                 .ConfigureAwait(false);
 
             return txHash;
+        }
+
+        public async Task<bool> CheckItemExistsAsync(byte[] itemId)
+        {
+            ItemDetails itemDetails = await GetItemDetailsAsync(itemId)
+                .ConfigureAwait(false);
+
+            return itemDetails.Valid();
         }
 
         public async Task<ItemDetails> GetItemDetailsAsync(byte[] itemId)

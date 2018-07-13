@@ -9,8 +9,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nethereum.Hex.HexConvertors.Extensions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Image = GrandBazaar.WebClient.Areas.Seller.Models.Image;
+
 
 namespace GrandBazaar.WebClient.Areas.Seller.Controllers
 {
@@ -28,32 +32,54 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
         // GET: Items
         public async Task<ActionResult> Index()
         {
-            string address = GetAccountAddressOrFail();
-
-            List<byte[]> sellerItems = await EthereumService
-                .GetItemsAsync(address)
-                .ConfigureAwait(false);
-            if (sellerItems.IsNullOrEmpty())
+            return await ExecuteInTryCatch(async () =>
             {
-                return View(new List<ItemViewModel>());
-            }
+                string address = GetAccountAddressOrFail();
 
-            List<Item> items = await IpfsService
-                .GetItemsAsync(sellerItems)
-                .ConfigureAwait(false);
-            return View(items.ToViewModels());
+                List<byte[]> sellerItems = await EthereumService
+                    .GetItemsAsync(address)
+                    .ConfigureAwait(false);
+                if (sellerItems.IsNullOrEmpty())
+                {
+                    return View(new List<ItemViewModel>());
+                }
+
+                List<Item> items = await IpfsService
+                    .GetItemsAsync(sellerItems)
+                    .ConfigureAwait(false);
+                return View(items.ToViewModels());
+            }, new List<ItemViewModel>());
         }
 
         // GET: Items/Details/5
         public async Task<ActionResult> Details(string id)
         {
-            byte[] itemId = id.HexToByteArray();
-            Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
-            int quantity = await EthereumService
-                .GetItemAvailabilityAsync(itemId)
-                .ConfigureAwait(false);
+            return await ExecuteInTryCatch(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    throw new Exception("Item Id must be specified.");
+                }
 
-            return View(item.ToViewModel(quantity));
+                byte[] itemId = id.HexToByteArray();
+
+                bool itemExists = await EthereumService
+                    .CheckItemExistsAsync(itemId)
+                    .ConfigureAwait(false);
+                if (!itemExists)
+                {
+                    throw new Exception($"Item with Id {id} does not exist.");
+                }
+
+                Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
+                int quantity = await EthereumService
+                    .GetItemAvailabilityAsync(itemId)
+                    .ConfigureAwait(false);
+
+                var model = item.ToViewModel(quantity);
+                model.Valid = true;
+                return View(model);
+            }, new ItemViewModel());
         }
 
         // GET: Items/Create
@@ -67,37 +93,45 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateItemViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            return await ExecuteInTryCatch(async () =>
             {
-                IFormFile keystore =
-                    HttpContext.Request.Form.Files.GetFile("keystore");
-                if (keystore.Length == 0)
+                ViewData["ReturnUrl"] = returnUrl;
+                if (ModelState.IsValid)
                 {
-                    return View(model);
+                    IFormFile keystore =
+                        HttpContext.Request.Form.Files.GetFile("keystore");
+                    if (keystore.Length == 0)
+                    {
+                        throw new Exception("Keystore file must be specified.");
+                    }
+
+                    IReadOnlyList<IFormFile> images =
+                        HttpContext.Request.Form.Files.GetFiles("images");
+                    if (images.All(img => img.Length == 0))
+                    {
+                        throw new Exception("Your item must have at least one image.");
+                    }
+
+                    Item item = model.ToDomainModel(images);
+
+                    byte[] itemId = await IpfsService
+                        .AddItemAsync(item)
+                        .ConfigureAwait(false);
+
+                    string txHash = await EthereumService.AddItemAsync(
+                        keystore.ReadAllText(),
+                        model.AccountPassword,
+                        itemId,
+                        model.Price,
+                        model.Quantity)
+                        .ConfigureAwait(false);
+
+                    ShowTransactionInfo(txHash);
+                    return RedirectToAction(nameof(Index));
                 }
 
-                IReadOnlyList<IFormFile> images =
-                    HttpContext.Request.Form.Files.GetFiles("images");
-                Item item = model.ToDomainModel(images);
-                byte[] itemId = await IpfsService
-                    .AddItemAsync(item)
-                    .ConfigureAwait(false);
-
-                string txHash = await EthereumService.AddItemAsync(
-                    keystore.ReadAllText(),
-                    model.AccountPassword,
-                    itemId,
-                    model.Price,
-                    model.Quantity)
-                    .ConfigureAwait(false);
-                string txUrl = EthereumService.GetTransactionUrl(txHash);
-
-                TempData["TxInfo"] = txUrl;
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(model);
+                return View(model);
+            }, model);
         }
     }
 }
