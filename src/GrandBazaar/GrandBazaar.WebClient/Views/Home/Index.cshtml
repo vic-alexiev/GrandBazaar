@@ -42,5 +42,5 @@
            src="~/images/tugra.png"
            title="Enter"
            id="myEnter"
-           onclick="location.href='@Url.Action("Index", "Items", new { area = "Customer" })'" />
+           onclick="location.href='@Url.Action("Index", "Items", new { area = User.IsInRole("Seller") ? "Seller" : "Customer" })'" />
 </div>

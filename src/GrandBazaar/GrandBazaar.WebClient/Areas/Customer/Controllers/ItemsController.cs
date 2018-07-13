@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 namespace GrandBazaar.WebClient.Areas.Customer.Controllers
 {
     [Area("Customer")]
-    [Authorize(Roles = "Customer")]
     public class ItemsController : ItemsControllerBase
     {
         public ItemsController(
@@ -55,78 +54,11 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
             return View(item.ToViewModel(quantity));
         }
 
-        // GET: Items/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Items/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Items/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Items/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Items/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Items/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Items/Purchase/5
+        // GET: Items/Purchase?id=xxx&price=100000
+        [Authorize(Roles = "Customer")]
         public ActionResult Purchase(string id, long price)
         {
+            // TODO: fix
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new Exception("Item Id must be specified.");
@@ -147,6 +79,7 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
         // POST: Items/Purchase/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult> Purchase(PurchaseItemViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;

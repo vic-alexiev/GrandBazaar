@@ -58,6 +58,9 @@
     }
 </div>
 <div>
-    @Html.ActionLink("Purchase", "Purchase", new { id = Model.Id, price = Model.Price }) |
-    <a asp-action="Index">Back to List</a>
+    @if (User.Identity.IsAuthenticated && User.IsInRole("Customer") && Model.Quantity > 0)
+    {
+        @Html.ActionLink("Purchase", "Purchase", new { id = Model.Id, price = Model.Price })
+    }
+    | <a asp-action="Index">Back to List</a>
 </div>

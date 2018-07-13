@@ -52,13 +52,10 @@
     background: #393;
 }
 
-    #infoBox > p > a {
+    #infoBox > p > a,
+    #infoBox > p > a:hover {
         color: white;
     }
-
-        #infoBox > p > a:hover {
-            color: white;
-        }
 
     #infoBox > header {
         float: right;

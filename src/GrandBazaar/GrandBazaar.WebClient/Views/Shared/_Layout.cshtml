@@ -30,24 +30,18 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Seller"))
-                        {
-                            <a asp-area="Seller" asp-controller="Items" asp-action="Index">My Items</a>
-                        }
-                    </li>
-                    <li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Customer"))
-                        {
-                            <a asp-area="Customer" asp-controller="Items" asp-action="Index">Items For Sale</a>
-                        }
-                    </li>
-                    <li>
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                        {
-                            <a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a>
-                        }
-                    </li>
+                    @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+                    {
+                        <li><a asp-area="Customer" asp-controller="Items" asp-action="Index">Items for Sale</a></li>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Seller"))
+                    {
+                        <li><a asp-area="Seller" asp-controller="Items" asp-action="Index">My Items</a></li>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <li><a asp-area="" asp-controller="Admin" asp-action="Index">Admin Page</a></li>
+                    }
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                 </ul>
