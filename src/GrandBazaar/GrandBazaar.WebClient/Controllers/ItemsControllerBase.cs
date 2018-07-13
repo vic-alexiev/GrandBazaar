@@ -35,5 +35,20 @@ namespace GrandBazaar.WebClient.Controllers
             }
             return _accountAddress;
         }
+
+        public async Task<ActionResult> ExecuteInTryCatch(
+            Func<Task<ActionResult>> block,
+            object model)
+        {
+            try
+            {
+                return await block();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(model);
+            }
+        }
     }
 }

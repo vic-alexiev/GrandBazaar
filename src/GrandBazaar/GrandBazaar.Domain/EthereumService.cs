@@ -1,7 +1,9 @@
-﻿using Nethereum.Contracts;
+﻿using GrandBazaar.Domain.Models;
+using Nethereum.Contracts;
 using Nethereum.Hex.HexTypes;
 using Nethereum.Web3;
 using Nethereum.Web3.Accounts;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -83,6 +85,17 @@ namespace GrandBazaar.Domain
                 .ConfigureAwait(false);
 
             return txHash;
+        }
+
+        public async Task<ItemDetails> GetItemDetailsAsync(byte[] itemId)
+        {
+            Function getItemDetailsFunc = _contract.GetFunction("detailsOf");
+            object[] input = new object[] { itemId };
+
+            ItemDetails itemDetails = await getItemDetailsFunc
+                .CallDeserializingToObjectAsync<ItemDetails>(functionInput: input)
+                .ConfigureAwait(false);
+            return itemDetails;
         }
 
         public async Task<List<byte[]>> GetAllItemsAsync()

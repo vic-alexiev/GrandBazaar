@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GrandBazaar.Domain.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GrandBazaar.Domain
@@ -20,6 +21,8 @@ namespace GrandBazaar.Domain
             byte[] itemId,
             long price,
             int quantity);
+
+        Task<ItemDetails> GetItemDetailsAsync(byte[] itemId);
 
         Task<List<byte[]>> GetAllItemsAsync();
 

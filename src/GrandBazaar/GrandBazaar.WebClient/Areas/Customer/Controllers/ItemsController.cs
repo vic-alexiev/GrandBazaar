@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Nethereum.Hex.HexConvertors.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace GrandBazaar.WebClient.Areas.Customer.Controllers
@@ -33,7 +34,7 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
                 .ConfigureAwait(false);
             if (allItems.IsNullOrEmpty())
             {
-                return View();
+                return View(new List<ItemViewModel>());
             }
 
             List<Item> items = await IpfsService
@@ -45,35 +46,50 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
         // GET: Items/Details/5
         public async Task<ActionResult> Details(string id)
         {
-            byte[] itemId = id.HexToByteArray();
-            Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
-            int quantity = await EthereumService
-                .GetItemAvailabilityAsync(itemId)
-                .ConfigureAwait(false);
+            try
+            {
+                byte[] itemId = id.HexToByteArray();
+                Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
+                int quantity = await EthereumService
+                    .GetItemAvailabilityAsync(itemId)
+                    .ConfigureAwait(false);
 
-            return View(item.ToViewModel(quantity));
+                return View(item.ToViewModel(quantity));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+                return View(new ItemViewModel());
+            }
         }
 
-        // GET: Items/Purchase?id=xxx&price=100000
+        // GET: Items/Purchase/5
         [Authorize(Roles = "Customer")]
-        public ActionResult Purchase(string id, long price)
+        public async Task<ActionResult> Purchase(string id)
         {
-            // TODO: fix
-            if (string.IsNullOrWhiteSpace(id))
+            return await ExecuteInTryCatch(async () =>
             {
-                throw new Exception("Item Id must be specified.");
-            }
-            if (price <= 0)
-            {
-                throw new Exception("Item price must be greater than 0.");
-            }
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    throw new Exception("Item Id must be specified.");
+                }
 
-            var model = new PurchaseItemViewModel
-            {
-                Id = id,
-                Price = price
-            };
-            return View(model);
+                ItemDetails itemDetails = await EthereumService
+                    .GetItemDetailsAsync(id.HexToByteArray())
+                    .ConfigureAwait(false);
+                if (itemDetails.Seller.HexToBigInteger(true) == BigInteger.Zero)
+                {
+                    throw new Exception("Invalid item Id.");
+                }
+
+                var model = new PurchaseItemViewModel
+                {
+                    SellerAddress = itemDetails.Seller,
+                    Id = id,
+                    Price = itemDetails.Price
+                };
+                return View(model);
+            }, new PurchaseItemViewModel());
         }
 
         // POST: Items/Purchase/5
@@ -82,30 +98,33 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
         [Authorize(Roles = "Customer")]
         public async Task<ActionResult> Purchase(PurchaseItemViewModel model, string returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            if (ModelState.IsValid)
+            return await ExecuteInTryCatch(async () =>
             {
-                IFormFile keystore =
-                    HttpContext.Request.Form.Files.GetFile("keystore");
-                if (keystore.Length == 0)
+                ViewData["ReturnUrl"] = returnUrl;
+                if (ModelState.IsValid)
                 {
-                    return View(model);
+                    IFormFile keystore =
+                        HttpContext.Request.Form.Files.GetFile("keystore");
+                    if (keystore.Length == 0)
+                    {
+                        throw new Exception("Keystore file must be specified.");
+                    }
+
+                    string txHash = await EthereumService.PurchaseAsync(
+                        keystore.ReadAllText(),
+                        model.AccountPassword,
+                        model.Id.HexToByteArray(),
+                        model.Price,
+                        model.Quantity)
+                        .ConfigureAwait(false);
+                    string txUrl = EthereumService.GetTransactionUrl(txHash);
+
+                    TempData["TxInfo"] = txUrl;
+                    return RedirectToAction(nameof(Index));
                 }
 
-                string txHash = await EthereumService.PurchaseAsync(
-                    keystore.ReadAllText(),
-                    model.AccountPassword,
-                    model.Id.HexToByteArray(),
-                    model.Price,
-                    model.Quantity)
-                    .ConfigureAwait(false);
-                string txUrl = EthereumService.GetTransactionUrl(txHash);
-
-                TempData["TxInfo"] = txUrl;
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(model);
+                return View(model);
+            }, model);
         }
     }
 }

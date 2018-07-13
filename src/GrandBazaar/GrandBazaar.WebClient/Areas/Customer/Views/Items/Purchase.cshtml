@@ -4,6 +4,13 @@
     ViewData["Title"] = "Purchase";
 }
 
+@section Scripts{
+    @if (TempData["Error"] != null)
+    {
+        <script>grandBazaar.showError('@TempData["Error"]')</script>
+    }
+}
+
 <h2>Purchase</h2>
 
 <h4>Place your order here</h4>
@@ -12,6 +19,11 @@
     <div class="col-md-4">
         <form asp-action="Purchase" asp-route-returnUrl="@ViewData["ReturnUrl"]" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SellerAddress" class="control-label"></label>
+                <input asp-for="SellerAddress" class="form-control" readonly="readonly" />
+                <span asp-validation-for="SellerAddress" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
                 <input asp-for="Price" class="form-control" readonly="readonly" />

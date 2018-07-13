@@ -50,6 +50,8 @@
         </div>
     </nav>
     <div class="container body-content">
+        <section id="infoBox"><header>x</header><p>Info</p></section>
+        <section id="errorBox"><header>x</header><p>Error</p></section>
         @RenderBody()
         <hr />
         <footer>
@@ -60,6 +62,7 @@
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/grandbazaar.js"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
     </environment>
     <environment exclude="Development">

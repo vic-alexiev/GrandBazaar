@@ -40,7 +40,11 @@
     padding-top: 20px;
 }
 
-#infoBox {
+a.btn-purchase::after{
+    content: ' |'
+}
+
+#infoBox, #errorBox {
     display: none;
     padding: 20px 5px;
     width: 80%;
@@ -49,21 +53,30 @@
     text-align: center;
     padding: 5px;
     border-radius: 3px;
+}
+
+#infoBox {
     background: #393;
 }
 
-    #infoBox > p > a,
-    #infoBox > p > a:hover {
-        color: white;
-    }
+#errorBox {
+    background: #F50;
+}
 
-    #infoBox > header {
-        float: right;
-        margin-right: 5px;
-    }
+#infoBox > p > a,
+#infoBox > p > a:hover {
+    color: white;
+}
 
-        #infoBox > header:hover {
-            transition: all 0.2s;
-            font-weight: bold;
-            cursor: pointer;
-        }
+#infoBox > header,
+#errorBox > header {
+    float: right;
+    margin-right: 5px;
+}
+
+    #infoBox > header:hover,
+    #errorBox > header:hover {
+        transition: all 0.2s;
+        font-weight: bold;
+        cursor: pointer;
+    }

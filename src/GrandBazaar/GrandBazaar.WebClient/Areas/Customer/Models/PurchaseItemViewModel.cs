@@ -4,6 +4,9 @@ namespace GrandBazaar.WebClient.Areas.Customer.Models
 {
     public class PurchaseItemViewModel
     {
+        public string SellerAddress { get; set; }
+
+        [Required]
         public string Id { get; set; }
 
         [Required, Range(1, long.MaxValue)]

@@ -35,7 +35,7 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
                 .ConfigureAwait(false);
             if (sellerItems.IsNullOrEmpty())
             {
-                return View();
+                return View(new List<ItemViewModel>());
             }
 
             List<Item> items = await IpfsService

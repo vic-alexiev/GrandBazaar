@@ -7,20 +7,11 @@
 }
 
 @section Scripts{
-    <script>
-        function showTxInfo(url) {
-            $('#infoBox>p').html(`Transaction hash: <a href="${url}" target="_blank">${url}</a>`);
-            $('#infoBox').show();
-            $('#infoBox>header').click(function () { $('#infoBox').hide(); });
-        }
-    </script>
     @if (TempData["TxInfo"] != null)
     {
-        <script>showTxInfo('@TempData["TxInfo"]')</script>
+        <script>grandBazaar.showTxInfo('@TempData["TxInfo"]')</script>
     }
 }
-
-<section id="infoBox"><header>x</header><p>Info</p></section>
 
 <h2>Index</h2>
 
@@ -46,30 +37,27 @@
         </tr>
     </thead>
     <tbody>
-        @if (!Model.IsNullOrEmpty())
+        @foreach (var item in Model)
         {
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        <a href="http://localhost:5001/ipfs/QmQLXHs7K98JNQdWrBB2cQLJahPhmupbDjRuH1b9ibmwVa/?#/objects/ipfs/@item.IpfsHash" target="_blank">
-                            @item.IpfsHash
-                        </a>
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Price)
-                    </td>
-                    <td>
-                        @Html.ActionLink("Details", "Details", new { area = "Seller", id = item.Id })
-                    </td>
-                </tr>
-            }
+            <tr>
+                <td>
+                    <a href="http://localhost:5001/ipfs/QmQLXHs7K98JNQdWrBB2cQLJahPhmupbDjRuH1b9ibmwVa/?#/objects/ipfs/@item.IpfsHash" target="_blank">
+                        @item.IpfsHash
+                    </a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { area = "Seller", id = item.Id })
+                </td>
+            </tr>
         }
     </tbody>
 </table>
