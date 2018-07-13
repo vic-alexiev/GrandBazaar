@@ -72,11 +72,11 @@
 }
 <div>
     @if (Model.Valid &&
-       Model.Quantity > 0 &&
-       User.Identity.IsAuthenticated &&
-       User.IsInRole("Customer"))
+        Model.Quantity > 0 &&
+        User.Identity.IsAuthenticated &&
+        User.IsInRole("Customer"))
     {
-        @Html.ActionLink("Purchase", "Purchase", new { id = Model.Id }, new { @class = "btn-purchase" })
+        @Html.ActionLink("Purchase", "Purchase", new { id = Model.Id }, new { @class = "delimited" })
     }
     <a asp-action="Index">Back to List</a>
 </div>

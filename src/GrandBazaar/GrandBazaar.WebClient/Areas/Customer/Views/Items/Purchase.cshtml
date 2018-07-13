@@ -59,7 +59,7 @@
 <div>
     @if (Model.Valid)
     {
-        @Html.ActionLink("Details", "Details", new { area = "Customer", id = Model.Id }, new { @class = "btn-purchase" })
+        @Html.ActionLink("Details", "Details", new { area = "Customer", id = Model.Id }, new { @class = "delimited" })
     }
     <a asp-action="Index">Back to List</a>
 </div>
