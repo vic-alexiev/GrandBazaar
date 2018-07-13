@@ -19,7 +19,6 @@ namespace GrandBazaar.WebClient.Areas.Seller.Mappers
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
-                Quantity = model.Quantity,
                 Images = new List<DomainImage>()
             };
 
@@ -42,7 +41,7 @@ namespace GrandBazaar.WebClient.Areas.Seller.Mappers
             return item;
         }
 
-        public static ItemViewModel ToViewModel(this Item model, int? quantity = null)
+        public static ItemViewModel ToViewModel(this Item model, int stock = 0)
         {
             return new ItemViewModel
             {
@@ -51,7 +50,7 @@ namespace GrandBazaar.WebClient.Areas.Seller.Mappers
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
-                Quantity = quantity ?? model.Quantity,
+                Stock = stock,
                 Images = model.Images.Select(image => new Image
                 {
                     Name = image.Name,

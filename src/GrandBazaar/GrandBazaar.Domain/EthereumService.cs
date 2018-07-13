@@ -124,15 +124,15 @@ namespace GrandBazaar.Domain
             return items;
         }
 
-        public async Task<int> GetItemAvailabilityAsync(byte[] itemId)
+        public async Task<int> GetItemStockAsync(byte[] itemId)
         {
             Function getItemsFunc = _contract.GetFunction("availability");
             object[] input = new object[] { itemId };
 
-            int availability = await getItemsFunc
+            int stock = await getItemsFunc
                 .CallAsync<int>(functionInput: input)
                 .ConfigureAwait(false);
-            return availability;
+            return stock;
         }
 
         private Account GetAccount(

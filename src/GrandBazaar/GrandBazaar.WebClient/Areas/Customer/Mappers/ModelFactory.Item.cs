@@ -8,7 +8,7 @@ namespace GrandBazaar.WebClient.Areas.Customer.Mappers
 {
     public static class ModelFactory
     {
-        public static ItemViewModel ToViewModel(this Item model, int? quantity = null)
+        public static ItemViewModel ToViewModel(this Item model, int stock = 0)
         {
             return new ItemViewModel
             {
@@ -17,7 +17,7 @@ namespace GrandBazaar.WebClient.Areas.Customer.Mappers
                 Name = model.Name,
                 Description = model.Description,
                 Price = model.Price,
-                Quantity = quantity ?? model.Quantity,
+                Stock = stock,
                 Images = model.Images.Select(image => new Image
                 {
                     Name = image.Name,

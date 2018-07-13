@@ -68,11 +68,11 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
                 }
 
                 Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
-                int quantity = await EthereumService
-                    .GetItemAvailabilityAsync(itemId)
+                int stock = await EthereumService
+                    .GetItemStockAsync(itemId)
                     .ConfigureAwait(false);
 
-                var model = item.ToViewModel(quantity);
+                var model = item.ToViewModel(stock);
                 model.Valid = true;
                 return View(model);
             }, new ItemViewModel());
@@ -107,10 +107,10 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
                     Valid = true
                 };
 
-                int availability = await EthereumService
-                    .GetItemAvailabilityAsync(itemId)
+                int stock = await EthereumService
+                    .GetItemStockAsync(itemId)
                     .ConfigureAwait(false);
-                if (availability == 0)
+                if (stock == 0)
                 {
                     ShowError("This item is out of stock.");
                     return View(model);
@@ -139,17 +139,27 @@ namespace GrandBazaar.WebClient.Areas.Customer.Controllers
                         throw new Exception("Keystore file must be specified.");
                     }
 
-                    int availability = await EthereumService
-                        .GetItemAvailabilityAsync(model.Id.HexToByteArray())
+                    byte[] itemId = model.Id.HexToByteArray();
+
+                    bool itemExists = await EthereumService
+                        .CheckItemExistsAsync(itemId)
                         .ConfigureAwait(false);
-                    if (availability == 0)
+                    if (!itemExists)
+                    {
+                        throw new Exception($"Item with Id {model.Id} does not exist.");
+                    }
+
+                    int stock = await EthereumService
+                        .GetItemStockAsync(itemId)
+                        .ConfigureAwait(false);
+                    if (stock == 0)
                     {
                         throw new Exception("This item is out of stock.");
                     }
 
-                    if (model.Quantity > availability)
+                    if (model.Quantity > stock)
                     {
-                        throw new Exception($"Not enough stock. Only {availability} piece(s) left.");
+                        throw new Exception($"Not enough stock. Only {stock} piece(s) left.");
                     }
 
                     string txHash = await EthereumService.PurchaseAsync(

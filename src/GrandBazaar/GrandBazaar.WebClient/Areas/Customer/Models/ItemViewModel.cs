@@ -14,7 +14,7 @@ namespace GrandBazaar.WebClient.Areas.Customer.Models
 
         public long Price { get; set; }
 
-        public int Quantity { get; set; }
+        public int Stock { get; set; }
 
         public List<Image> Images { get; set; }
 

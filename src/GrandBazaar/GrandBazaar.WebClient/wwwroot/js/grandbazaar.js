@@ -1,6 +1,6 @@
 ﻿var grandBazaar = (function () {
     var showTxInfo = function (url) {
-        $('#infoBox>p').html(`Transaction hash: <a href="${url}" target="_blank">${url}</a>`);
+        $('#infoBox>p').html(`Transaction URL: <a href="${url}" target="_blank">${url}</a>`);
         $('#infoBox').show();
         $('#infoBox>header').click(function () { $('#infoBox').hide(); });
     }

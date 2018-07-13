@@ -14,8 +14,6 @@ namespace GrandBazaar.Domain.Models
 
         public long Price { get; set; }
 
-        public int Quantity { get; set; }
-
         public List<Image> Images { get; set; }
     }
 }

@@ -6,9 +6,10 @@ namespace GrandBazaar.WebClient.Areas.Seller.Models
     {
         public string Id { get; set; }
 
-        [Required]
+        [Required, MinLength(1), MaxLength(255)]
         public string Name { get; set; }
 
+        [MaxLength(255)]
         public string Description { get; set; }
 
         [Required, Range(1, long.MaxValue)]
@@ -17,7 +18,7 @@ namespace GrandBazaar.WebClient.Areas.Seller.Models
         [Required, Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
-        [Required]
+        [Required, MaxLength(255)]
         [DataType(DataType.Password)]
         public string AccountPassword { get; set; }
     }

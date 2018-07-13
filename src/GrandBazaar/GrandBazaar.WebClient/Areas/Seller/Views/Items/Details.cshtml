@@ -42,12 +42,14 @@
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Price)
+                Wei
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @Html.DisplayNameFor(model => model.Stock)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Quantity)
+                @Html.DisplayFor(model => model.Stock)
+                (@(Model.Stock > 0 ? "In Stock" : "Out of Stock"))
             </dd>
         </dl>
     </div>

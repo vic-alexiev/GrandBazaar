@@ -30,6 +30,6 @@ namespace GrandBazaar.Domain
 
         Task<List<byte[]>> GetItemsAsync(string address);
 
-        Task<int> GetItemAvailabilityAsync(byte[] itemId);
+        Task<int> GetItemStockAsync(byte[] itemId);
     }
 }

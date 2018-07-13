@@ -36,12 +36,14 @@
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Price)
+                Wei
             </dd>
             <dt>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @Html.DisplayNameFor(model => model.Stock)
             </dt>
             <dd>
-                @Html.DisplayFor(model => model.Quantity)
+                @Html.DisplayFor(model => model.Stock)
+                (@(Model.Stock > 0 ? "In Stock" : "Out of Stock"))
             </dd>
         </dl>
     </div>
@@ -72,9 +74,9 @@
 }
 <div>
     @if (Model.Valid &&
-        Model.Quantity > 0 &&
-        User.Identity.IsAuthenticated &&
-        User.IsInRole("Customer"))
+     Model.Stock > 0 &&
+     User.Identity.IsAuthenticated &&
+     User.IsInRole("Customer"))
     {
         @Html.ActionLink("Purchase", "Purchase", new { id = Model.Id }, new { @class = "delimited" })
     }

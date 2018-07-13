@@ -72,11 +72,11 @@ namespace GrandBazaar.WebClient.Areas.Seller.Controllers
                 }
 
                 Item item = await IpfsService.GetItemAsync(itemId).ConfigureAwait(false);
-                int quantity = await EthereumService
-                    .GetItemAvailabilityAsync(itemId)
+                int stock = await EthereumService
+                    .GetItemStockAsync(itemId)
                     .ConfigureAwait(false);
 
-                var model = item.ToViewModel(quantity);
+                var model = item.ToViewModel(stock);
                 model.Valid = true;
                 return View(model);
             }, new ItemViewModel());
