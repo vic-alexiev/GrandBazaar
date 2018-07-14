@@ -7,6 +7,7 @@ What is Grand Bazaar?
 *Constantinople* release is due to come...  
 *Istanbul* code-coverage testing framework...  
 *Kapalicarsi* anyone?  
+
 *GrandBazaar* is an ASP.NET Core MVC project which implements a decentralized marketplace.
 
 * Visitors (users not logged in the web app) can view all the items listed for selling as well as each item's details. Each item can have one or more images. Visitors are not allowed to purchase items.
@@ -30,7 +31,7 @@ What is Grand Bazaar?
 * Customers have an account which is used when purchasing items (for signing the transaction). Again a keystore file and a password are required. This way there is no need to store customers' account private keys server-side.
 
 Technical Details
-=================
+-----------------
 
 * .NET Core 2.1
 * Entity Framework Core Tools 2.0.1
@@ -43,7 +44,7 @@ Technical Details
 * MetaMask and web3.js
 
 Starting the Project
-====================
+--------------------
 
 * Clone the project locally and open it in Visual Studio (version >= 2017).
 * Restore NuGet packages.
