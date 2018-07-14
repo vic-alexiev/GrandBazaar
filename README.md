@@ -56,7 +56,21 @@ Starting the Project
 Screenshots
 -----------
 
-* <a href="https://user-images.githubusercontent.com/3578679/42722497-a1de794e-8755-11e8-8c3c-9962eef89c55.png" target="_parent">Home page</a>
+* <a href="https://user-images.githubusercontent.com/3578679/42722497-a1de794e-8755-11e8-8c3c-9962eef89c55.png" target="_blank">Home Page</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722564-a671fb06-8756-11e8-9f72-b5108abf00d0.png" target="_blank">Items for Sale</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722574-dfb97556-8756-11e8-81ae-4f0f1d98d33c.png" target="_blank">Item Details</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722581-0a778454-8757-11e8-8aa1-c36035ebe57b.png" target="_blank">Item Purchase</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722589-2243e974-8757-11e8-9096-3047cade08b7.png" target="_blank">Item Purchase Transaction</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722600-5bff3b5a-8757-11e8-852a-d8b79578092a.png" target="_blank">Seller Items</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722610-7e84e6de-8757-11e8-82f1-5845ddb2b770.png" target="_blank">Seller Add Item</a>
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722618-aa99a44e-8757-11e8-9bdd-bb6594d11855.png" target="_blank">Seller Add Item Transaction</a>
 
 Running the Tests
 -----------------
