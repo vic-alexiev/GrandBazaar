@@ -53,6 +53,11 @@ Starting the Project
 * In a command line start the local IPFS daemon by executing `ipfs daemon`.
 * Start the project.
 
+Screenshots
+-----------
+
+* <a href="https://user-images.githubusercontent.com/3578679/42722497-a1de794e-8755-11e8-8c3c-9962eef89c55.png" target="_parent">Home page</a>
+
 Running the Tests
 -----------------
 
