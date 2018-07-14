@@ -18,7 +18,8 @@ $(document).ready(function () {
             if (result && result[0]) {
                 console.log('Current Web3 account: ' + result[0]);
             } else {
-                grandBazaar.showError('Please, log in MetaMask!');
+                // don't show error
+                //grandBazaar.showError('Please, log in MetaMask!');
             }
             setCookie('web3-account', result[0]);
         });
