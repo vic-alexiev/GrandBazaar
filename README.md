@@ -1,8 +1,13 @@
 GrandBazaar
 ===========
 
+<p align="center">
+  <img width="121" height="100" src="https://user-images.githubusercontent.com/3578679/42722661-a5d34b1c-8758-11e8-8c6d-72e7a71b89e0.png">
+</p>
+
 What is Grand Bazaar?
 ---------------------
+
 *Byzantium* hard fork...  
 *Constantinople* release is due to come...  
 *Istanbul* code-coverage testing framework...  
